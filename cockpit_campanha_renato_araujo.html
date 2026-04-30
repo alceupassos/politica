@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cockpit de Campanha — Renato Araújo · Deputado Federal 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+<style>
+  :root {
+    --verde: #1B8A3E;
+    --amarelo: #F0C030;
+    --azul: #1A4FA0;
+    --azul-esc: #0D2B5C;
+    --cinza-bg: #0f0f13;
+    --cinza-painel: #16161d;
+    --cinza-card: #1e1e28;
+    --cinza-borda: #2a2a38;
+    --branco: #f0f0f0;
+    --texto-sec: #8a8aaa;
+    --verde-ok: #22c55e;
+    --vermelho: #ef4444;
+    --amarelo-alerta: #f59e0b;
+    --roxo: #8b5cf6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+  html, body { height: 100%; background: var(--cinza-bg); color: var(--branco); overflow: hidden; }
+  #app { display: flex; height: 100vh; }
+
+  /* ── SIDEBAR ── */
+  #sidebar { width: 210px; min-width: 210px; background: var(--cinza-painel); border-right: 1px solid var(--cinza-borda); display: flex; flex-direction: column; overflow-y: auto; }
+  #sidebar::-webkit-scrollbar { width: 3px; }
+  #sidebar::-webkit-scrollbar-thumb { background: #2a2a38; border-radius: 3px; }
+
+  .logo-area { padding: 16px 12px 12px; border-bottom: 1px solid var(--cinza-borda); text-align: center; }
+  .logo-box { background: #000; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+  .logo-img { display: block; width: 100%; height: auto; }
+  .logo-photo-frame { margin-top: 10px; border-radius: 10px; overflow: hidden; border: 1px solid #2f3d56; background: linear-gradient(180deg, #101521, #161d2b); }
+  .logo-photo { display: block; width: 100%; height: 156px; object-fit: cover; object-position: center top; }
+  .versao { font-size: 9px; color: var(--texto-sec); letter-spacing: 1px; text-transform: uppercase; }
+
+  .nav-section { padding: 8px 0; }
+  .nav-label { font-size: 9px; color: var(--texto-sec); text-transform: uppercase; letter-spacing: 1px; padding: 6px 14px 4px; }
+  .nav-item { display: flex; align-items: center; gap: 8px; padding: 9px 14px; cursor: pointer; border-left: 3px solid transparent; font-size: 12px; color: var(--texto-sec); transition: all .15s; user-select: none; }
+  .nav-item:hover { background: var(--cinza-card); color: var(--branco); }
+  .nav-item.active { background: var(--cinza-card); color: var(--verde-ok); border-left-color: var(--verde-ok); }
+  .nav-icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .nav-icon svg, .top-icon svg, .ai-icon svg, .social-icon svg, .mini-icon svg { width: 16px; height: 16px; stroke-width: 2; }
+
+  .sidebar-footer { padding: 12px; margin-top: auto; border-top: 1px solid var(--cinza-borda); }
+  .sf-label { font-size: 10px; color: var(--texto-sec); margin-bottom: 3px; }
+  .sf-val { font-size: 11px; color: var(--verde-ok); }
+
+  /* ── MAIN ── */
+  #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+  /* ── TOPBAR ── */
+  #topbar { background: var(--cinza-painel); border-bottom: 1px solid var(--cinza-borda); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; min-height: 54px; flex-shrink: 0; }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .page-title { font-size: 16px; font-weight: 600; }
+  .page-sub { font-size: 11px; color: var(--texto-sec); margin-top: 1px; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .badge-live { background: #1a2a1a; color: var(--verde-ok); font-size: 10px; padding: 4px 10px; border-radius: 20px; border: 1px solid #22c55e44; display: flex; align-items: center; gap: 5px; }
+  .dot-live { width: 6px; height: 6px; border-radius: 50%; background: var(--verde-ok); animation: pulse 1.5s infinite; flex-shrink: 0; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .btn-top { background: var(--cinza-card); border: 1px solid var(--cinza-borda); color: var(--branco); font-size: 11px; padding: 6px 13px; border-radius: 6px; cursor: pointer; transition: background .15s; }
+  .btn-top:hover { background: #2a2a38; }
+  .icon-btn { display: inline-flex; align-items: center; gap: 7px; }
+  .top-icon { width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--azul); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+
+  /* ── CONTENT ── */
+  #content { flex: 1; overflow-y: auto; padding: 16px; background: var(--cinza-bg); }
+  #content::-webkit-scrollbar { width: 5px; }
+  #content::-webkit-scrollbar-track { background: transparent; }
+  #content::-webkit-scrollbar-thumb { background: #2a2a38; border-radius: 3px; }
+
+  /* ── SECTIONS ── */
+  .section { display: none; animation: fadeIn .2s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── KPI ROW ── */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .kpi-card { background: var(--cinza-card); border: 1px solid var(--cinza-borda); border-radius: 10px; padding: 14px 16px; }
+  .kpi-label { font-size: 10px; color: var(--texto-sec); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; }
+  .kpi-value { font-size: 26px; font-weight: 700; line-height: 1; }
+  .kpi-sub { font-size: 11px; margin-top: 5px; }
+  .kpi-bar { margin-top: 9px; height: 4px; background: #2a2a38; border-radius: 2px; overflow: hidden; }
+  .kpi-fill { height: 100%; border-radius: 2px; }
+
+  .up   { color: #22c55e; }
+  .down { color: #ef4444; }
+  .warn { color: #f59e0b; }
+
+  /* ── LAYOUTS ── */
+  .grid2     { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .grid3     { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .grid-7-5  { display: grid; grid-template-columns: 7fr 5fr; gap: 12px; margin-bottom: 14px; }
+  .grid-cand { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .mb14 { margin-bottom: 14px; }
+
+  /* ── CARD ── */
+  .card { background: var(--cinza-card); border: 1px solid var(--cinza-borda); border-radius: 10px; padding: 14px; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--cinza-borda); flex-wrap: wrap; gap: 6px; }
+  .card-title { font-size: 11px; font-weight: 600; color: var(--branco); text-transform: uppercase; letter-spacing: .5px; }
+  .card-badge { font-size: 10px; padding: 2px 9px; border-radius: 20px; white-space: nowrap; }
+  .badge-verde   { background: #1a3a1a; color: #22c55e; border: 1px solid #22c55e33; }
+  .badge-azul    { background: #1a2a4a; color: #60a5fa; border: 1px solid #3b82f633; }
+  .badge-amarelo { background: #3a2a0a; color: #f59e0b; border: 1px solid #f59e0b33; }
+  .badge-vermelho{ background: #3a1a1a; color: #ef4444; border: 1px solid #ef444433; }
+  .badge-roxo    { background: #3a1a5a; color: #c084fc; border: 1px solid #8b5cf633; }
+  .badge-cinza   { background: #2a2a3a; color: #888; border: 1px solid #44444433; }
+  .badge-real     { background: #103a24; color: #86efac; border: 1px solid #22c55e44; }
+  .badge-est      { background: #1a2a4a; color: #93c5fd; border: 1px solid #3b82f644; }
+  .badge-pendente { background: #3a2a0a; color: #fbbf24; border: 1px solid #f59e0b44; }
+  .source-link { color: #93c5fd; text-decoration: none; font-weight: 600; }
+  .source-link:hover { color: #bfdbfe; text-decoration: underline; }
+  .small-note { color: var(--texto-sec); font-size: 10px; line-height: 1.45; margin-top: 8px; }
+  .need-pill { display: inline-block; margin: 2px 3px 2px 0; padding: 2px 7px; border-radius: 999px; background: #243044; color: #d7e2f2; font-size: 10px; white-space: nowrap; }
+  .mockup-warning { margin: 18px 0 6px; padding: 12px 14px; border: 1px solid #f59e0b55; border-radius: 8px; background: #2d210f; color: #fbbf24; text-align: center; font-size: 12px; letter-spacing: .4px; }
+
+  /* ── CHART ── */
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* ── TABLE ── */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .tbl th { color: var(--texto-sec); font-weight: 500; text-transform: uppercase; letter-spacing: .4px; font-size: 10px; padding: 6px 8px; border-bottom: 1px solid var(--cinza-borda); text-align: left; }
+  .tbl td { padding: 8px 8px; border-bottom: 1px solid #1e1e2866; color: var(--branco); }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl tr:hover td { background: rgba(42,42,56,.4); }
+
+  /* ── MINI BAR ── */
+  .mini-bar-wrap { display: flex; align-items: center; gap: 6px; }
+  .mini-bar-bg   { flex: 1; height: 6px; background: #2a2a38; border-radius: 3px; overflow: hidden; }
+  .mini-bar-fill { height: 100%; border-radius: 3px; }
+  .mini-val      { font-size: 11px; font-weight: 600; min-width: 34px; text-align: right; }
+
+  /* ── AI ITEMS ── */
+  .ai-item { background: #1a1a2a; border: 1px solid #8b5cf622; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; display: flex; gap: 10px; align-items: flex-start; }
+  .ai-icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; color: #c0c0e0; }
+  .ai-text { font-size: 11px; line-height: 1.55; color: #c0c0e0; }
+  .ai-tag  { display: inline-block; font-size: 9px; padding: 2px 7px; border-radius: 10px; margin-top: 5px; }
+
+  /* ── RANK ── */
+  .rank-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--cinza-borda); }
+  .rank-item:last-child { border-bottom: none; }
+  .rank-num  { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .rank-photo { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; object-position: center top; border: 1px solid rgba(255,255,255,.12); flex-shrink: 0; }
+  .rank-info { flex: 1; }
+  .rank-nome { font-size: 12px; font-weight: 600; }
+  .rank-partido { font-size: 10px; color: var(--texto-sec); margin-top: 1px; }
+  .rank-voto { font-size: 14px; font-weight: 700; }
+  .rank-delta { font-size: 10px; margin-top: 2px; }
+
+  /* ── BAIRROS ── */
+  .bairro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .bairro-item { background: #1a1a28; border: 1px solid var(--cinza-borda); border-radius: 6px; padding: 8px 10px; }
+  .bairro-nome { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+  .bairro-bar-wrap { display: flex; gap: 4px; align-items: center; }
+  .bairro-bar  { flex: 1; height: 5px; background: #2a2a38; border-radius: 2px; overflow: hidden; }
+  .bairro-fill { height: 100%; border-radius: 2px; }
+  .bairro-pct  { font-size: 10px; min-width: 32px; text-align: right; }
+
+  /* ── SOCIAL ── */
+  .social-row  { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--cinza-borda); }
+  .social-row:last-child { border-bottom: none; }
+  .social-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .social-info { flex: 1; }
+  .social-nome { font-size: 12px; font-weight: 600; }
+  .social-seg  { font-size: 10px; color: var(--texto-sec); }
+  .social-engaj { font-size: 13px; font-weight: 700; }
+  .social-trend { font-size: 10px; margin-top: 1px; }
+  .influencer-cell { display: flex; align-items: center; gap: 9px; min-width: 170px; }
+  .influencer-avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #0f172a; background: linear-gradient(135deg, #facc15, #22c55e); flex-shrink: 0; border: 1px solid rgba(255,255,255,.12); }
+  .influencer-name { font-size: 12px; font-weight: 700; }
+  .influencer-handle { font-size: 10px; color: var(--texto-sec); margin-top: 1px; }
+
+  /* ── PROGRESS ── */
+  .prog-row   { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .prog-label { font-size: 11px; min-width: 130px; color: var(--texto-sec); }
+  .prog-bar   { flex: 1; height: 8px; background: #2a2a38; border-radius: 4px; overflow: hidden; }
+  .prog-fill  { height: 100%; border-radius: 4px; }
+  .prog-val   { font-size: 11px; font-weight: 600; min-width: 36px; text-align: right; }
+
+  /* ── CANDIDATO CARD ── */
+  .cand-card { background: var(--cinza-card); border: 1px solid var(--cinza-borda); border-radius: 10px; padding: 14px; cursor: pointer; transition: border-color .15s; }
+  .cand-card:hover { border-color: #8b5cf666; }
+  .cand-card.destaque { border-color: #22c55e !important; }
+  .cand-card.active-detail { box-shadow: 0 0 0 1px #22c55e66 inset; }
+  .cand-head { display: flex; gap: 12px; margin-bottom: 10px; align-items: stretch; }
+  .cand-photo-wrap { width: 74px; flex-shrink: 0; border-radius: 9px; overflow: hidden; border: 1px solid rgba(255,255,255,.08); background: #101520; }
+  .cand-photo { display: block; width: 100%; height: 100%; min-height: 88px; object-fit: cover; object-position: center top; }
+  .cand-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .cand-top { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+  .cand-avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .cand-nome    { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .cand-partido { font-size: 10px; color: var(--texto-sec); margin-bottom: 8px; }
+  .cand-stat    { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; }
+  .cand-stat span:first-child { color: var(--texto-sec); }
+  .cand-stat span:last-child { font-weight: 600; }
+
+  /* ── DAILY ── */
+  .daily-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--cinza-borda); }
+  .daily-item:last-child { border-bottom: none; }
+  .daily-time { font-size: 10px; color: var(--texto-sec); min-width: 40px; padding-top: 2px; }
+  .daily-dot  { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .daily-body { flex: 1; }
+  .daily-text { font-size: 11px; line-height: 1.4; }
+  .daily-tipo { font-size: 10px; color: var(--texto-sec); margin-top: 2px; }
+
+  /* ── ALERT BOX ── */
+  .alert-box { border-radius: 8px; padding: 10px 12px; font-size: 11px; line-height: 1.5; }
+  .alert-red  { background: #2a1a1a; border: 1px solid #ef444433; color: #fca5a5; }
+  .alert-grn  { background: #1a2a1a; border: 1px solid #22c55e33; color: #86efac; }
+  .detail-hero { display: grid; grid-template-columns: 110px 1fr; gap: 14px; align-items: center; margin-bottom: 14px; }
+  .detail-photo { width: 110px; height: 132px; object-fit: cover; object-position: center top; border-radius: 10px; border: 1px solid rgba(255,255,255,.12); }
+  .detail-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .detail-sub { color: var(--texto-sec); font-size: 12px; margin-bottom: 10px; }
+  .detail-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .detail-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 12px; margin-top: 12px; }
+  .detail-list { display: grid; gap: 8px; }
+  .detail-row { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--cinza-borda); font-size: 11px; }
+  .detail-row:last-child { border-bottom: none; }
+  .link-button { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; color: var(--branco); border: 1px solid var(--cinza-borda); background: #20202b; padding: 7px 10px; border-radius: 7px; text-decoration: none; }
+  .link-button:hover { background: #2a2a38; }
+
+  /* ── PREVISAO BOX ── */
+  .prev-box { text-align: center; padding: 12px 0; }
+  .prev-big { font-size: 44px; font-weight: 800; color: #22c55e; line-height: 1; }
+  .prev-label { font-size: 13px; color: var(--texto-sec); margin-top: 4px; }
+  .prev-pct { font-size: 30px; font-weight: 700; color: #22c55e; margin: 4px 0 12px; }
+  .prev-row { display: flex; justify-content: center; gap: 24px; font-size: 11px; }
+  .prev-col { text-align: center; }
+  .prev-col div:first-child { color: var(--texto-sec); margin-bottom: 2px; }
+
+  /* ── RESPONSIVO BÁSICO ── */
+  @media (max-width: 900px) {
+    #sidebar { width: 52px; min-width: 52px; }
+    .nav-label, .nav-item span:not(.nav-icon), .logo-box, .versao, .sf-label, .sf-val { display: none; }
+    .nav-item { padding: 12px; justify-content: center; }
+    .kpi-row { grid-template-columns: repeat(2,1fr); }
+    .grid2, .grid3, .grid-7-5, .grid-cand { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ SIDEBAR ══ -->
+  <div id="sidebar">
+    <div class="logo-area">
+      <div class="logo-box">
+        <img class="logo-img" src="renatobrancofundoecuro.png" alt="Renato Araújo do Bolsonaro">
+      </div>
+      <div class="logo-photo-frame">
+        <img class="logo-photo" src="candidatos/c8.png" alt="Foto principal de Renato Araújo">
+      </div>
+      <div class="versao">Cockpit v2.0 · 2026</div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <div class="nav-item active" onclick="showSection('dashboard')"><span class="nav-icon"><i data-lucide="layout-dashboard"></i></span><span>Dashboard</span></div>
+      <div class="nav-item" onclick="showSection('pesquisas')"><span class="nav-icon"><i data-lucide="chart-column"></i></span><span>Pesquisas</span></div>
+      <div class="nav-item" onclick="showSection('territorios')"><span class="nav-icon"><i data-lucide="map"></i></span><span>Territórios</span></div>
+      <div class="nav-item" onclick="showSection('concorrentes')"><span class="nav-icon"><i data-lucide="crosshair"></i></span><span>Concorrentes</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Monitoramento</div>
+      <div class="nav-item" onclick="showSection('redes')"><span class="nav-icon"><i data-lucide="smartphone"></i></span><span>Redes Sociais</span></div>
+      <div class="nav-item" onclick="showSection('midia')"><span class="nav-icon"><i data-lucide="radio-tower"></i></span><span>Mídia &amp; Imprensa</span></div>
+      <div class="nav-item" onclick="showSection('influenciadores')"><span class="nav-icon"><i data-lucide="users-round"></i></span><span>Influenciadores</span></div>
+      <div class="nav-item" onclick="showSection('diario')"><span class="nav-icon"><i data-lucide="clipboard-list"></i></span><span>Diário Campanha</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Inteligência</div>
+      <div class="nav-item" onclick="showSection('ia')"><span class="nav-icon"><i data-lucide="brain-circuit"></i></span><span>IA Preditiva</span></div>
+      <div class="nav-item" onclick="showSection('demandas')"><span class="nav-icon"><i data-lucide="messages-square"></i></span><span>Demandas Pop.</span></div>
+      <div class="nav-item" onclick="showSection('financeiro')"><span class="nav-icon"><i data-lucide="wallet"></i></span><span>Financeiro</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Campo</div>
+      <div class="nav-item" onclick="showSection('candidatos')"><span class="nav-icon"><i data-lucide="user-round-search"></i></span><span>Candidatos</span></div>
+      <div class="nav-item" onclick="showSection('eventos')"><span class="nav-icon"><i data-lucide="calendar-days"></i></span><span>Agenda</span></div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sf-label">Última atualização</div>
+      <div class="sf-val" id="lastUpdate">—</div>
+    </div>
+  </div>
+
+  <!-- ══ MAIN ══ -->
+  <div id="main">
+
+    <!-- TOPBAR -->
+    <div id="topbar">
+      <div class="topbar-left">
+        <div>
+          <div class="page-title" id="pageTitle">Dashboard Geral</div>
+          <div class="page-sub" id="pageSub">Eleições Federais 2026 · Deputado Federal · Rio de Janeiro / Angra dos Reis</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="badge-live"><div class="dot-live"></div> AO VIVO</div>
+        <button class="btn-top icon-btn" onclick="reloadCharts()"><span class="top-icon"><i data-lucide="refresh-cw"></i></span><span>Atualizar</span></button>
+        <button class="btn-top icon-btn"><span class="top-icon"><i data-lucide="settings-2"></i></span><span>Config</span></button>
+        <div class="avatar">G</div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div id="content">
+
+      <!-- ══════════════════════════════════════
+           DASHBOARD
+      ══════════════════════════════════════ -->
+      <div id="sec-dashboard" class="section active">
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-label">Intenção de Voto</div>
+            <div class="kpi-value" style="color:#22c55e;">8.7%</div>
+            <div class="kpi-sub up">▲ +1.2% vs mês anterior</div>
+            <div class="kpi-bar"><div class="kpi-fill" style="width:87%;background:#22c55e;"></div></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Posição no RJ</div>
+            <div class="kpi-value" style="color:#60a5fa;">#4°</div>
+            <div class="kpi-sub up">▲ Subiu 2 posições</div>
+            <div class="kpi-bar"><div class="kpi-fill" style="width:72%;background:#3b82f6;"></div></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Votos Estimados</div>
+            <div class="kpi-value" style="color:#f59e0b;">68.4K</div>
+            <div class="kpi-sub up">▲ +5.1K vs semana</div>
+            <div class="kpi-bar"><div class="kpi-fill" style="width:65%;background:#f59e0b;"></div></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Aprovação Geral</div>
+            <div class="kpi-value" style="color:#22c55e;">61%</div>
+            <div class="kpi-sub up">▲ +4pp vs anterior</div>
+            <div class="kpi-bar"><div class="kpi-fill" style="width:61%;background:#22c55e;"></div></div>
+          </div>
+        </div>
+
+        <div class="grid-7-5">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Evolução Intenção de Voto — 2026</div>
+              <span class="card-badge badge-verde">Tendência positiva</span>
+            </div>
+            <div class="chart-wrap" style="height:200px;"><canvas id="cEvolucao"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Perfil do Eleitor</div>
+              <span class="card-badge badge-azul">por faixa etária</span>
+            </div>
+            <div class="chart-wrap" style="height:200px;"><canvas id="cFaixa"></canvas></div>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Top Municípios</div>
+              <span class="card-badge badge-verde">força eleitoral</span>
+            </div>
+            <table class="tbl">
+              <thead><tr><th>Município</th><th>Votos Est.</th><th>%</th><th>Var.</th></tr></thead>
+              <tbody>
+                <tr><td><b>Angra dos Reis</b></td><td>18.2K</td><td><div class="mini-bar-wrap"><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:88%;background:#22c55e;"></div></div><span class="mini-val up">88%</span></div></td><td class="up">▲+3.1</td></tr>
+                <tr><td>Paraty</td><td>8.4K</td><td><div class="mini-bar-wrap"><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:62%;background:#3b82f6;"></div></div><span class="mini-val" style="color:#60a5fa;">62%</span></div></td><td class="up">▲+1.8</td></tr>
+                <tr><td>Rio Claro</td><td>5.1K</td><td><div class="mini-bar-wrap"><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:55%;background:#3b82f6;"></div></div><span class="mini-val" style="color:#60a5fa;">55%</span></div></td><td class="up">▲+2.2</td></tr>
+                <tr><td>Mangaratiba</td><td>4.8K</td><td><div class="mini-bar-wrap"><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:48%;background:#f59e0b;"></div></div><span class="mini-val warn">48%</span></div></td><td class="warn">→ 0.0</td></tr>
+                <tr><td>Itaguaí</td><td>3.9K</td><td><div class="mini-bar-wrap"><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:38%;background:#f59e0b;"></div></div><span class="mini-val warn">38%</span></div></td><td class="down">▼-0.5</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Redes Sociais Hoje</div>
+              <span class="card-badge badge-verde">engajamento</span>
+            </div>
+            <div class="social-row"><div class="social-icon" style="background:#1877f222;"><i data-lucide="facebook"></i></div><div class="social-info"><div class="social-nome">Facebook</div><div class="social-seg">48.3K seguidores</div></div><div style="text-align:right"><div class="social-engaj up">4.2%</div><div class="social-trend up">alto</div></div></div>
+            <div class="social-row"><div class="social-icon" style="background:#e1306c22;"><i data-lucide="instagram"></i></div><div class="social-info"><div class="social-nome">Instagram</div><div class="social-seg">32.7K seguidores</div></div><div style="text-align:right"><div class="social-engaj up">6.8%</div><div class="social-trend up">excelente</div></div></div>
+            <div class="social-row"><div class="social-icon" style="background:#1da1f222;"><i data-lucide="message-circle-more"></i></div><div class="social-info"><div class="social-nome">Twitter / X</div><div class="social-seg">18.1K seguidores</div></div><div style="text-align:right"><div class="social-engaj warn">2.1%</div><div class="social-trend warn">médio</div></div></div>
+            <div class="social-row"><div class="social-icon" style="background:#25d36622;"><i data-lucide="messages-square"></i></div><div class="social-info"><div class="social-nome">WhatsApp</div><div class="social-seg">12 grupos ativos</div></div><div style="text-align:right"><div class="social-engaj up">87%</div><div class="social-trend up">alcance</div></div></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Alertas e Ações</div>
+              <span class="card-badge badge-amarelo">atenção</span>
+            </div>
+            <div class="ai-item"><div class="ai-icon"><i data-lucide="alert-octagon"></i></div><div class="ai-text">Concorrente <b>Chico da Roça</b> ganhou 1.2pp em Itaguaí. Ação imediata recomendada.<span class="ai-tag badge-vermelho">Urgente</span></div></div>
+            <div class="ai-item"><div class="ai-icon"><i data-lucide="triangle-alert"></i></div><div class="ai-text">Engajamento no X caiu 18%. Publicar 2 vídeos de posicionamento.<span class="ai-tag badge-amarelo">Atenção</span></div></div>
+            <div class="ai-item"><div class="ai-icon"><i data-lucide="circle-check-big"></i></div><div class="ai-text">Aprovação em Angra subiu 3pp. Manter agenda na região.<span class="ai-tag badge-verde">Positivo</span></div></div>
+          </div>
+        </div>
+
+        <div class="card mb14">
+          <div class="card-header"><div class="card-title">Painel de Fontes e Qualidade dos Dados</div><span class="card-badge badge-real">REAL + ESTIMADO</span></div>
+          <table class="tbl">
+            <thead><tr><th>Área</th><th>O que entrou</th><th>Fonte principal</th><th>Atualização</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><b>Mídia</b></td><td>Matérias reais sobre Renato com sentimento e link</td><td><a class="source-link" href="https://odia.ig.com.br/angra-dos-reis/2025/08/7107057-empresario-angrense-aliado-de-bolsonaro-tem-autorizacao-do-stf-para-visitar-o-ex-presidente.html" target="_blank" rel="noopener">O Dia</a>, Correio da Manhã, A Voz da Cidade</td><td>30/04/2026 16:10</td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td><b>Redes</b></td><td>Feed de posts, agenda editorial e links públicos</td><td><a class="source-link" href="https://www.instagram.com/renatoaraujorj/" target="_blank" rel="noopener">Instagram @renatoaraujorj</a> + matérias com embeds</td><td>30/04/2026 16:10</td><td><span class="card-badge badge-est">ESTIMADO</span></td></tr>
+              <tr><td><b>Demandas</b></td><td>Necessidades e desejos por bairro/região</td><td><a class="source-link" href="https://angra.rj.gov.br/noticias/02-04-2025/programa-comunidades-de-angra-visita-11-bairros-em-2025" target="_blank" rel="noopener">Programa Comunidades de Angra</a> + Plano Diretor</td><td>30/04/2026 16:10</td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td><b>Influenciadores</b></td><td>Handles públicos, métricas e território provável</td><td><a class="source-link" href="https://www.modash.io/find-influencers/brazil/angra-dos-reis" target="_blank" rel="noopener">Modash</a> + Favikon</td><td>30/04/2026 16:10</td><td><span class="card-badge badge-real">REAL</span></td></tr>
+            </tbody>
+          </table>
+          <div class="small-note">Convenção: REAL = fonte pública confirmada; ESTIMADO = cálculo ou leitura interna do cockpit; PENDENTE = precisa de coleta manual/API autorizada.</div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Progresso de Metas</div><span class="card-badge badge-azul">campanha 2026</span></div>
+            <div class="prog-row"><div class="prog-label">Votos cadastrados</div><div class="prog-bar"><div class="prog-fill" style="width:72%;background:#22c55e;"></div></div><div class="prog-val up">72%</div></div>
+            <div class="prog-row"><div class="prog-label">Municípios cobertos</div><div class="prog-bar"><div class="prog-fill" style="width:58%;background:#3b82f6;"></div></div><div class="prog-val" style="color:#60a5fa;">58%</div></div>
+            <div class="prog-row"><div class="prog-label">Cabos eleitorais</div><div class="prog-bar"><div class="prog-fill" style="width:83%;background:#22c55e;"></div></div><div class="prog-val up">83%</div></div>
+            <div class="prog-row"><div class="prog-label">Budget gasto</div><div class="prog-bar"><div class="prog-fill" style="width:41%;background:#f59e0b;"></div></div><div class="prog-val warn">41%</div></div>
+            <div class="prog-row"><div class="prog-label">Agenda de eventos</div><div class="prog-bar"><div class="prog-fill" style="width:67%;background:#3b82f6;"></div></div><div class="prog-val" style="color:#60a5fa;">67%</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Previsão de Eleição — IA</div><span class="card-badge badge-roxo">Modelo preditivo</span></div>
+            <div class="prev-box">
+              <div class="prev-big">ELEITO</div>
+              <div class="prev-label">Probabilidade de eleição</div>
+              <div class="prev-pct">82%</div>
+              <div class="prev-row">
+                <div class="prev-col"><div>Otimista</div><div class="up" style="font-weight:700;font-size:14px;">95%</div></div>
+                <div class="prev-col"><div>Base</div><div class="warn" style="font-weight:700;font-size:14px;">82%</div></div>
+                <div class="prev-col"><div>Pessimista</div><div class="down" style="font-weight:700;font-size:14px;">61%</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PESQUISAS ══ -->
+      <div id="sec-pesquisas" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Pesquisas Ativas</div><div class="kpi-value" style="color:#60a5fa;">7</div><div class="kpi-sub" style="color:var(--texto-sec);">3 institutos distintos</div></div>
+          <div class="kpi-card"><div class="kpi-label">Melhor posição</div><div class="kpi-value" style="color:#22c55e;">#1°</div><div class="kpi-sub up">Paraná Pesq. abr/2026</div></div>
+          <div class="kpi-card"><div class="kpi-label">Média dos institutos</div><div class="kpi-value" style="color:#f59e0b;">8.4%</div><div class="kpi-sub up">▲ +0.8pp mensal</div></div>
+          <div class="kpi-card"><div class="kpi-label">Margem de erro</div><div class="kpi-value" style="color:#8a8aaa;">±2.3%</div><div class="kpi-sub" style="color:var(--texto-sec);">média ponderada</div></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Ranking por Instituto</div><span class="card-badge badge-azul">comparativo</span></div>
+            <div class="chart-wrap" style="height:240px;"><canvas id="cInstitutos"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Histórico Pesquisas 2026</div><span class="card-badge badge-verde">linha do tempo</span></div>
+            <div class="chart-wrap" style="height:240px;"><canvas id="cHistPeq"></canvas></div>
+          </div>
+        </div>
+        <div class="card mb14">
+          <div class="card-header"><div class="card-title">Pesquisas Eleitorais — Detalhamento</div><span class="card-badge badge-azul">todos institutos</span></div>
+          <table class="tbl">
+            <thead><tr><th>Instituto</th><th>Data</th><th>Âmbito</th><th>Renato Araújo</th><th>Posição</th><th>Tendência</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><b>Datafolha</b></td><td>28/04/2026</td><td>RJ Geral</td><td class="up" style="font-weight:700;">9.1%</td><td class="up">#3°</td><td class="up">▲ +1.5pp</td><td><span class="card-badge badge-verde">Publicada</span></td></tr>
+              <tr><td><b>IBOPE/Ipespe</b></td><td>22/04/2026</td><td>Costa Verde</td><td class="up" style="font-weight:700;">12.8%</td><td class="up">#1°</td><td class="up">▲ +3.2pp</td><td><span class="card-badge badge-verde">Publicada</span></td></tr>
+              <tr><td><b>Quaest</b></td><td>18/04/2026</td><td>RJ Geral</td><td class="warn" style="font-weight:700;">7.6%</td><td class="warn">#5°</td><td class="up">▲ +0.8pp</td><td><span class="card-badge badge-verde">Publicada</span></td></tr>
+              <tr><td><b>AtlasIntel</b></td><td>15/04/2026</td><td>RJ Interior</td><td class="up" style="font-weight:700;">8.9%</td><td class="up">#4°</td><td class="warn">→ estável</td><td><span class="card-badge badge-verde">Publicada</span></td></tr>
+              <tr><td><b>Paraná Pesquisas</b></td><td>10/04/2026</td><td>Costa Verde</td><td class="up" style="font-weight:700;">14.2%</td><td class="up">#1°</td><td class="up">▲ +2.1pp</td><td><span class="card-badge badge-verde">Publicada</span></td></tr>
+              <tr><td><b>Datafolha</b></td><td>02/05/2026</td><td>RJ Geral</td><td style="color:#8a8aaa;font-weight:700;">—</td><td style="color:#8a8aaa;">Em campo</td><td>—</td><td><span class="card-badge badge-amarelo">Em campo</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ TERRITÓRIOS ══ -->
+      <div id="sec-territorios" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Bairros mapeados</div><div class="kpi-value" style="color:#22c55e;">147</div><div class="kpi-sub up">▲ +12 este mês</div></div>
+          <div class="kpi-card"><div class="kpi-label">Municípios ativos</div><div class="kpi-value" style="color:#60a5fa;">18</div><div class="kpi-sub" style="color:var(--texto-sec);">de 22 na Costa Verde</div></div>
+          <div class="kpi-card"><div class="kpi-label">Cabos Eleitorais</div><div class="kpi-value" style="color:#f59e0b;">312</div><div class="kpi-sub up">▲ +28 ativos</div></div>
+          <div class="kpi-card"><div class="kpi-label">Cobertura Costa Verde</div><div class="kpi-value" style="color:#22c55e;">78%</div><div class="kpi-sub up">▲ meta: 95%</div></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Bairros — Angra dos Reis</div><span class="card-badge badge-verde">domínio</span></div>
+            <div class="bairro-grid">
+              <div class="bairro-item"><div class="bairro-nome">Centro</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:91%;background:#22c55e;"></div></div><span class="bairro-pct up">91%</span></div></div>
+              <div class="bairro-item"><div class="bairro-nome">Frade</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:78%;background:#22c55e;"></div></div><span class="bairro-pct up">78%</span></div></div>
+              <div class="bairro-item"><div class="bairro-nome">Mambucaba</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:82%;background:#22c55e;"></div></div><span class="bairro-pct up">82%</span></div></div>
+              <div class="bairro-item"><div class="bairro-nome">Japuíba</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:69%;background:#3b82f6;"></div></div><span class="bairro-pct" style="color:#60a5fa;">69%</span></div></div>
+              <div class="bairro-item"><div class="bairro-nome">Parque Mambucaba</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:74%;background:#22c55e;"></div></div><span class="bairro-pct up">74%</span></div></div>
+              <div class="bairro-item"><div class="bairro-nome">Balneário</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:55%;background:#f59e0b;"></div></div><span class="bairro-pct warn">55%</span></div></div>
+              <div class="bairro-item"><div class="bairro-nome">Cunhambebe</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:61%;background:#3b82f6;"></div></div><span class="bairro-pct" style="color:#60a5fa;">61%</span></div></div>
+              <div class="bairro-item"><div class="bairro-nome">Monte Verde</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:48%;background:#f59e0b;"></div></div><span class="bairro-pct warn">48%</span></div></div>
+              <div class="bairro-item"><div class="bairro-nome">Perequê</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:86%;background:#22c55e;"></div></div><span class="bairro-pct up">86%</span></div></div>
+              <div class="bairro-item"><div class="bairro-nome">Bracuí</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:38%;background:#ef4444;"></div></div><span class="bairro-pct down">38%</span></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Desempenho por Faixa Etária</div><span class="card-badge badge-azul">segmentação</span></div>
+            <div class="chart-wrap" style="height:180px;"><canvas id="cIdade"></canvas></div>
+            <table class="tbl" style="margin-top:14px;">
+              <thead><tr><th>Faixa</th><th>Aprovação</th><th>Voto Declarado</th><th>Tendência</th></tr></thead>
+              <tbody>
+                <tr><td>16–24 anos</td><td class="up">58%</td><td class="up">12%</td><td class="up">▲ crescendo</td></tr>
+                <tr><td>25–34 anos</td><td class="up">63%</td><td class="up">9%</td><td class="up">▲ forte</td></tr>
+                <tr><td>35–44 anos</td><td class="up">71%</td><td class="up">11%</td><td class="up">▲ sólido</td></tr>
+                <tr><td>45–59 anos</td><td class="up">68%</td><td class="up">8%</td><td class="warn">→ estável</td></tr>
+                <tr><td>60+ anos</td><td class="warn">44%</td><td class="warn">5%</td><td class="down">▼ atenção</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card mb14">
+          <div class="card-header"><div class="card-title">Flutuação de Ranking por Região — Últimas 4 semanas</div><span class="card-badge badge-azul">evolução</span></div>
+          <div class="chart-wrap" style="height:200px;"><canvas id="cFlutuacao"></canvas></div>
+        </div>
+      </div>
+
+      <!-- ══ CONCORRENTES ══ -->
+      <div id="sec-concorrentes" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Monitorados</div><div class="kpi-value" style="color:#60a5fa;">24</div><div class="kpi-sub" style="color:var(--texto-sec);">na mesma cadeira</div></div>
+          <div class="kpi-card"><div class="kpi-label">Maior ameaça</div><div class="kpi-value" style="color:#ef4444;">Chico</div><div class="kpi-sub down">▼ crescendo na região</div></div>
+          <div class="kpi-card"><div class="kpi-label">Diferença p/ 1°</div><div class="kpi-value" style="color:#f59e0b;">-1.8%</div><div class="kpi-sub warn">recuperável em 30d</div></div>
+          <div class="kpi-card"><div class="kpi-label">Nosso ranking</div><div class="kpi-value" style="color:#22c55e;">#4°</div><div class="kpi-sub up">▲ subindo</div></div>
+        </div>
+        <div class="card mb14">
+          <div class="card-header"><div class="card-title">Ranking Geral — Vagas Federal RJ 2026</div><span class="card-badge badge-azul">posição atual</span></div>
+          <div class="rank-item" onclick="showCandidateDetail('laura_carneiro')"><div class="rank-num" style="background:#f59e0b22;color:#f59e0b;">1</div><img class="rank-photo" src="candidatos/laura_carneiro_psd.png" alt="Laura Carneiro"><div class="rank-info"><div class="rank-nome">Laura Carneiro</div><div class="rank-partido">PSD · RJ</div></div><div style="text-align:right"><div class="rank-voto up">10.5%</div><div class="rank-delta warn">estável</div></div></div>
+          <div class="rank-item" onclick="showCandidateDetail('marcelo_crivella')"><div class="rank-num" style="background:#f59e0b22;color:#f59e0b;">2</div><img class="rank-photo" src="candidatos/marcelo_crivela_republicanos.png" alt="Marcelo Crivella"><div class="rank-info"><div class="rank-nome">Marcelo Crivella</div><div class="rank-partido">Republicanos · RJ</div></div><div style="text-align:right"><div class="rank-voto up">9.8%</div><div class="rank-delta up">+0.4pp</div></div></div>
+          <div class="rank-item" onclick="showCandidateDetail('dr_luizinho')"><div class="rank-num" style="background:#c0c0c022;color:#c0c0c0;">3</div><img class="rank-photo" src="candidatos/dr_luizinho_psb.png" alt="Dr. Luizinho"><div class="rank-info"><div class="rank-nome">Dr. Luizinho</div><div class="rank-partido">PSB · RJ</div></div><div style="text-align:right"><div class="rank-voto up">9.2%</div><div class="rank-delta up">+1.8pp</div></div></div>
+          <div class="rank-item" onclick="showCandidateDetail('renato_araujo')" style="background:#1a2a1a22;border-radius:8px;padding-left:8px;"><div class="rank-num" style="background:#22c55e22;color:#22c55e;">4</div><img class="rank-photo" src="candidatos/renato_araujo_PL.png" alt="Renato Araújo"><div class="rank-info"><div class="rank-nome" style="color:#22c55e;">Renato Araújo</div><div class="rank-partido" style="color:#22c55e99;">PL · Angra dos Reis</div></div><div style="text-align:right"><div class="rank-voto up">8.7%</div><div class="rank-delta up">+1.2pp</div></div></div>
+          <div class="rank-item" onclick="showCandidateDetail('celia_jordao')"><div class="rank-num" style="background:#3a3a3a;color:#888;">5</div><img class="rank-photo" src="candidatos/celia_jordao_PL.png" alt="Célia Jordão"><div class="rank-info"><div class="rank-nome">Célia Jordão</div><div class="rank-partido">PL para PSD · RJ</div></div><div style="text-align:right"><div class="rank-voto" style="color:#888;">7.9%</div><div class="rank-delta down">-0.3pp</div></div></div>
+          <div class="rank-item" onclick="showCandidateDetail('jorginho_brum')"><div class="rank-num" style="background:#3a3a3a;color:#888;">6</div><img class="rank-photo" src="candidatos/jorginho_brum.png" alt="Jorginho Brum"><div class="rank-info"><div class="rank-nome">Jorginho Brum</div><div class="rank-partido">MDB · RJ</div></div><div style="text-align:right"><div class="rank-voto" style="color:#888;">7.4%</div><div class="rank-delta down">-0.7pp</div></div></div>
+          <div class="rank-item" onclick="showCandidateDetail('aureo_ribeiro')"><div class="rank-num" style="background:#3a3a3a;color:#888;">7</div><img class="rank-photo" src="candidatos/aureo_ribeiro_pl.png" alt="Áureo Ribeiro"><div class="rank-info"><div class="rank-nome">Áureo Ribeiro</div><div class="rank-partido">PL · RJ</div></div><div style="text-align:right"><div class="rank-voto" style="color:#888;">6.8%</div><div class="rank-delta warn">estável</div></div></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Disputa por Zona — Costa Verde</div><span class="card-badge badge-vermelho">disputa direta</span></div>
+            <div class="chart-wrap" style="height:220px;"><canvas id="cConcor"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Análise — Chico da Roça</div><span class="card-badge badge-vermelho">risco médio-alto</span></div>
+            <div style="font-size:11px;color:var(--texto-sec);margin-bottom:10px;">PL · Interior RJ · em crescimento acelerado</div>
+            <div class="prog-row"><div class="prog-label">Força digital</div><div class="prog-bar"><div class="prog-fill" style="width:72%;background:#ef4444;"></div></div><div class="prog-val down">72%</div></div>
+            <div class="prog-row"><div class="prog-label">Presença em Itaguaí</div><div class="prog-bar"><div class="prog-fill" style="width:81%;background:#ef4444;"></div></div><div class="prog-val down">81%</div></div>
+            <div class="prog-row"><div class="prog-label">Budget estimado</div><div class="prog-bar"><div class="prog-fill" style="width:55%;background:#f59e0b;"></div></div><div class="prog-val warn">55%</div></div>
+            <div class="prog-row"><div class="prog-label">Base em Mangaratiba</div><div class="prog-bar"><div class="prog-fill" style="width:63%;background:#f59e0b;"></div></div><div class="prog-val warn">63%</div></div>
+            <div class="alert-box alert-red" style="margin-top:12px;">IA recomenda fortalecer presença em Itaguaí e Mangaratiba com agenda nas próximas 2 semanas.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ REDES SOCIAIS ══ -->
+      <div id="sec-redes" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Seguidores Total</div><div class="kpi-value" style="color:#60a5fa;">99.1K</div><div class="kpi-sub up">▲ +3.2K esta semana</div></div>
+          <div class="kpi-card"><div class="kpi-label">Alcance Semanal</div><div class="kpi-value" style="color:#22c55e;">342K</div><div class="kpi-sub up">▲ +18% vs anterior</div></div>
+          <div class="kpi-card"><div class="kpi-label">Engajamento Médio</div><div class="kpi-value" style="color:#f59e0b;">4.8%</div><div class="kpi-sub warn">meta: 6%</div></div>
+          <div class="kpi-card"><div class="kpi-label">Sentimento Positivo</div><div class="kpi-value" style="color:#22c55e;">78%</div><div class="kpi-sub up">▲ positivo</div></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Crescimento de Seguidores — 30d</div><span class="card-badge badge-azul">por plataforma</span></div>
+            <div class="chart-wrap" style="height:220px;"><canvas id="cRedes"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Sentimento das Menções</div><span class="card-badge badge-verde">análise IA</span></div>
+            <div class="chart-wrap" style="height:220px;"><canvas id="cSentimento"></canvas></div>
+          </div>
+        </div>
+        <div class="card mb14">
+          <div class="card-header"><div class="card-title">Posts de Maior Desempenho — Esta Semana</div><span class="card-badge badge-verde">top 5</span></div>
+          <table class="tbl">
+            <thead><tr><th>Post</th><th>Plataforma</th><th>Alcance</th><th>Curtidas</th><th>Compart.</th><th>Comentários</th><th>Engaj.</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>🎥 Passeata no Morro Santo Antônio</td><td>Instagram</td><td>48.2K</td><td>3.8K</td><td>842</td><td>234</td><td class="up">9.2%</td><td><span class="card-badge badge-est">ESTIMADO</span></td></tr>
+              <tr><td>📢 Apoio a Bolsonaro em coletiva</td><td>Instagram</td><td>32.1K</td><td>2.1K</td><td>519</td><td>187</td><td class="up">8.4%</td><td><span class="card-badge badge-est">ESTIMADO</span></td></tr>
+              <tr><td>🤝 Pré-candidatura a federal</td><td>Facebook</td><td>29.8K</td><td>1.9K</td><td>612</td><td>98</td><td class="up">7.8%</td><td><span class="card-badge badge-est">ESTIMADO</span></td></tr>
+              <tr><td>💬 Visita autorizada a Bolsonaro</td><td>Instagram</td><td>21.4K</td><td>1.2K</td><td>280</td><td>142</td><td class="warn">5.8%</td><td><span class="card-badge badge-est">ESTIMADO</span></td></tr>
+              <tr><td>📸 Agenda com aliados da direita</td><td>Facebook</td><td>18.7K</td><td>988</td><td>203</td><td>67</td><td class="warn">4.9%</td><td><span class="card-badge badge-est">ESTIMADO</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card mb14">
+          <div class="card-header"><div class="card-title">Feed de Posts Monitorados</div><span class="card-badge badge-real">links públicos</span></div>
+          <table class="tbl">
+            <thead><tr><th>Data</th><th>Plataforma</th><th>Formato</th><th>Tema</th><th>Região alvo</th><th>Link</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>22/09/2024</td><td>Instagram</td><td>Vídeo</td><td>Relato após passeata alvo de tiros</td><td>Morro Santo Antônio / Centro</td><td><a class="source-link" href="https://pleno.news/brasil/cidades/candidato-a-prefeito-do-pl-e-alvo-de-tiros-durante-passeata-no-rj.html" target="_blank" rel="noopener">matéria com embed</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>27/03/2025</td><td>Redes sociais</td><td>Foto</td><td>Renato com Bolsonaro e pauta federal</td><td>Costa Verde / RJ</td><td><a class="source-link" href="https://www.correiodamanha.com.br/correio-sul-fluminense/regiao-do-vale/2025/03/190836-angra-empresario-pretende-pleitear-vaga-para-federal.html" target="_blank" rel="noopener">Correio da Manhã</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>15/04/2025</td><td>Redes sociais</td><td>Nota</td><td>Agradecimento à equipe médica de Bolsonaro</td><td>Base bolsonarista / Costa Verde</td><td><a class="source-link" href="https://www.correiodamanha.com.br/correio-sul-fluminense/regiao-do-vale/2025/04/194176-empresario-de-angra-agradece-equipe-que-cuida-de-bolsonaro.html" target="_blank" rel="noopener">Correio da Manhã</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>07/08/2025</td><td>Instagram</td><td>Post</td><td>Manifestação após autorização de visita a Bolsonaro</td><td>Angra dos Reis / Direita RJ</td><td><a class="source-link" href="https://odia.ig.com.br/angra-dos-reis/2025/08/7107057-empresario-angrense-aliado-de-bolsonaro-tem-autorizacao-do-stf-para-visitar-o-ex-presidente.html" target="_blank" rel="noopener">O Dia</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>30/04/2026</td><td>Instagram</td><td>Perfil</td><td>Monitoramento do perfil oficial</td><td>RJ / Costa Verde</td><td><a class="source-link" href="https://www.instagram.com/renatoaraujorj/" target="_blank" rel="noopener">@renatoaraujorj</a></td><td><span class="card-badge badge-pendente">PENDENTE API</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card mb14">
+          <div class="card-header"><div class="card-title">Agenda Editorial e Conteúdo Planejado</div><span class="card-badge badge-est">ESTIMADO</span></div>
+          <table class="tbl">
+            <thead><tr><th>Quando</th><th>Plataforma</th><th>Tema</th><th>Objetivo</th><th>Região</th><th>Responsável</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>01/05</td><td>Instagram Reels</td><td>Trabalho e emprego</td><td>Reforçar pauta econômica</td><td>Itaguaí / Angra</td><td>Digital</td><td><span class="card-badge badge-amarelo">Roteiro</span></td></tr>
+              <tr><td>03/05</td><td>Facebook</td><td>Demandas do PCA</td><td>Mostrar escuta de bairro</td><td>Belém / Japuíba</td><td>Território</td><td><span class="card-badge badge-azul">Planejado</span></td></tr>
+              <tr><td>05/05</td><td>Instagram Stories</td><td>Segurança e risco em encostas</td><td>Responder PMRR com proposta</td><td>Centro / Morros</td><td>Conteúdo</td><td><span class="card-badge badge-azul">Planejado</span></td></tr>
+              <tr><td>07/05</td><td>YouTube Shorts</td><td>Turismo e renda</td><td>Conversão jovem empreendedor</td><td>Ilha Grande / Paraty</td><td>Vídeo</td><td><span class="card-badge badge-cinza">Pauta</span></td></tr>
+              <tr><td>10/05</td><td>WhatsApp</td><td>Saúde básica</td><td>Distribuição para lideranças</td><td>Frade / Mambucaba</td><td>Mobilização</td><td><span class="card-badge badge-cinza">Pauta</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ MÍDIA ══ -->
+      <div id="sec-midia" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Matérias reais</div><div class="kpi-value" style="color:#22c55e;">10</div><div class="kpi-sub up">fontes públicas checadas</div></div>
+          <div class="kpi-card"><div class="kpi-label">Veículos monitorados</div><div class="kpi-value" style="color:#60a5fa;">8</div><div class="kpi-sub" style="color:var(--texto-sec);">digital regional/nacional</div></div>
+          <div class="kpi-card"><div class="kpi-label">Tom favorável</div><div class="kpi-value" style="color:#22c55e;">40%</div><div class="kpi-sub up">4 de 10 matérias</div></div>
+          <div class="kpi-card"><div class="kpi-label">Tom crítico</div><div class="kpi-value" style="color:#ef4444;">40%</div><div class="kpi-sub down">4 de 10 matérias</div></div>
+        </div>
+        <div class="card mb14">
+          <div class="card-header"><div class="card-title">Matérias Reais Sobre Renato Araújo</div><span class="card-badge badge-real">com link e sentimento</span></div>
+          <table class="tbl">
+            <thead><tr><th>Data</th><th>Título curto</th><th>Resumo</th><th>Veículo</th><th>Sentimento</th><th>Link</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>27/03/2025</td><td><b>Pré-candidatura a federal</b></td><td>Renato confirma preparação para disputar vaga na Câmara Federal.</td><td>Correio da Manhã</td><td class="up">Favorável</td><td><a class="source-link" href="https://www.correiodamanha.com.br/correio-sul-fluminense/regiao-do-vale/2025/03/190836-angra-empresario-pretende-pleitear-vaga-para-federal.html" target="_blank" rel="noopener">abrir</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>15/04/2025</td><td><b>Apoio a Bolsonaro</b></td><td>Empresário de Angra participa de coletiva e agradece equipe médica.</td><td>Correio da Manhã</td><td class="up">Favorável</td><td><a class="source-link" href="https://www.correiodamanha.com.br/correio-sul-fluminense/regiao-do-vale/2025/04/194176-empresario-de-angra-agradece-equipe-que-cuida-de-bolsonaro.html" target="_blank" rel="noopener">abrir</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>07/08/2025</td><td><b>Autorizado a visitar Bolsonaro</b></td><td>O Dia registra autorização do STF para visita a Bolsonaro.</td><td>O Dia</td><td class="up">Favorável</td><td><a class="source-link" href="https://odia.ig.com.br/angra-dos-reis/2025/08/7107057-empresario-angrense-aliado-de-bolsonaro-tem-autorizacao-do-stf-para-visitar-o-ex-presidente.html" target="_blank" rel="noopener">abrir</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>2025</td><td><b>Queridinho bolsonarista</b></td><td>Matéria contextualiza a chancela dos Bolsonaro a Renato.</td><td>Tempo Real RJ</td><td class="up">Favorável</td><td><a class="source-link" href="https://temporealrj.com/renato-araujo-o-queridinho-dos-bolsonaristas/" target="_blank" rel="noopener">abrir</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>22/09/2024</td><td><b>Passeata alvo de tiros</b></td><td>Registro de tiros durante passeata de campanha em Angra.</td><td>Pleno.News</td><td class="warn">Neutro</td><td><a class="source-link" href="https://pleno.news/brasil/cidades/candidato-a-prefeito-do-pl-e-alvo-de-tiros-durante-passeata-no-rj.html" target="_blank" rel="noopener">abrir</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>22/09/2024</td><td><b>Violência em campanha</b></td><td>Gazeta do Povo noticia o mesmo episódio em passeio de campanha.</td><td>Gazeta do Povo</td><td class="warn">Neutro</td><td><a class="source-link" href="https://www.gazetadopovo.com.br/eleicoes/2024/tiros-passeata-candidato-angra-dos-reis-rio-de-janeiro/" target="_blank" rel="noopener">abrir</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>01/02/2024</td><td><b>Prefeitura aciona MP</b></td><td>Reportagem sobre pedido de devolução de recursos aos cofres públicos.</td><td>A Voz da Cidade</td><td class="down">Crítico</td><td><a class="source-link" href="https://avozdacidade.com/wp/prefeitura-de-angra-aciona-mp-para-que-empresario-devolva-mais-de-r-400-mil-aos-cofres-publicos/" target="_blank" rel="noopener">abrir</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>07/08/2024</td><td><b>Condomínio investigado</b></td><td>Matéria relata investigação de projeto ligado a empresa de Renato.</td><td>A Voz da Cidade</td><td class="down">Crítico</td><td><a class="source-link" href="https://avozdacidade.com/wp/ministerio-publico-investiga-projeto-de-condominio-de-luxo-feito-por-renato-araujo-em-angra/" target="_blank" rel="noopener">abrir</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>05/10/2024</td><td><b>Cobranças de ISS</b></td><td>Diário Carioca repercute dívidas municipais atribuídas a empresas ligadas ao candidato.</td><td>Diário Carioca</td><td class="down">Crítico</td><td><a class="source-link" href="https://www.diariocarioca.com/rio-de-janeiro/candidato-de-bolsonaro-em-angra-dos-reis-deve-r-120-mil-em-impostos/" target="_blank" rel="noopener">abrir</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>29/08/2025</td><td><b>Manifestação 7 de Setembro</b></td><td>BNews registra organização de ato em frente à casa de Bolsonaro.</td><td>BNews</td><td class="warn">Neutro</td><td><a class="source-link" href="https://www.bnews.com.br/noticias/politica/aliados-de-bolsonaro-organizam-manifestacao-no-7-de-setembro-em-frente-casa-de-praia-do-ex-presidente.html" target="_blank" rel="noopener">abrir</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+            </tbody>
+          </table>
+          <div class="small-note">Sentimento classificado do ponto de vista estratégico da campanha: Favorável, Crítico ou Neutro.</div>
+        </div>
+      </div>
+
+      <!-- ══ INFLUENCIADORES ══ -->
+      <div id="sec-influenciadores" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Perfis mapeados</div><div class="kpi-value" style="color:#60a5fa;">11</div><div class="kpi-sub up">fonte pública Modash/Favikon</div></div>
+          <div class="kpi-card"><div class="kpi-label">Audiência potencial</div><div class="kpi-value" style="color:#22c55e;">690K+</div><div class="kpi-sub up">soma estimada de seguidores</div></div>
+          <div class="kpi-card"><div class="kpi-label">Maior aderência local</div><div class="kpi-value" style="color:#f59e0b;">ANAYA</div><div class="kpi-sub up">71,66% Angra no público</div></div>
+          <div class="kpi-card"><div class="kpi-label">Fotos Instagram</div><div class="kpi-value" style="color:#f59e0b;">API</div><div class="kpi-sub warn">perfil direto bloqueou fetch</div></div>
+        </div>
+        <div class="card mb14">
+          <div class="card-header"><div class="card-title">Influenciadores por Bairro e Região</div><span class="card-badge badge-real">handles reais</span></div>
+          <table class="tbl">
+            <thead><tr><th>Perfil</th><th>Região provável</th><th>Tema</th><th>Seguidores</th><th>Engaj.</th><th>Afinidade</th><th>Link</th><th>Foto</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><div class="influencer-cell"><div class="influencer-avatar">VO</div><div><div class="influencer-name">Vinícius Oliveira</div><div class="influencer-handle">@viniatlantida</div></div></div></td><td>Angra / Ilha Grande</td><td>oceano, natureza, preservação</td><td>560.3K</td><td>1.75%</td><td class="up">neutro/favorável</td><td><a class="source-link" href="https://www.instagram.com/viniatlantida/" target="_blank" rel="noopener">Instagram</a></td><td><span class="card-badge badge-pendente">PENDENTE</span></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td><div class="influencer-cell"><div class="influencer-avatar" style="background:linear-gradient(135deg,#60a5fa,#22c55e);">GD</div><div><div class="influencer-name">Greg Duarte</div><div class="influencer-handle">@duarte_greg</div></div></div></td><td>Angra / Japuíba</td><td>política, segurança, denúncias</td><td>24.4K</td><td>5.23%</td><td class="warn">neutro</td><td><a class="source-link" href="https://www.instagram.com/duarte_greg/" target="_blank" rel="noopener">Instagram</a></td><td><span class="card-badge badge-pendente">PENDENTE</span></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td><div class="influencer-cell"><div class="influencer-avatar" style="background:linear-gradient(135deg,#f472b6,#facc15);">AN</div><div><div class="influencer-name">ANAYA</div><div class="influencer-handle">@anayadofrade</div></div></div></td><td>Frade</td><td>humor local, transporte, cotidiano</td><td>24.2K</td><td>1.32%</td><td class="up">alta conexão local</td><td><a class="source-link" href="https://www.instagram.com/anayadofrade/" target="_blank" rel="noopener">Instagram</a></td><td><span class="card-badge badge-pendente">PENDENTE</span></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td><div class="influencer-cell"><div class="influencer-avatar" style="background:linear-gradient(135deg,#cbd5e1,#38bdf8);">JP</div><div><div class="influencer-name">João Paulo Rosa Barros</div><div class="influencer-handle">@jotacutzz_</div></div></div></td><td>Angra / público jovem</td><td>barbearia, estética masculina</td><td>17.6K</td><td>4.21%</td><td class="warn">neutro</td><td><a class="source-link" href="https://www.instagram.com/jotacutzz_/" target="_blank" rel="noopener">Instagram</a></td><td><span class="card-badge badge-pendente">PENDENTE</span></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td><div class="influencer-cell"><div class="influencer-avatar" style="background:linear-gradient(135deg,#fb7185,#fbbf24);">FS</div><div><div class="influencer-name">Franciele Souza</div><div class="influencer-handle">@oii_sou_a_fran</div></div></div></td><td>Angra</td><td>moda, humor de casal, cristão</td><td>13K+</td><td>n/d</td><td class="warn">neutro</td><td><a class="source-link" href="https://www.instagram.com/oii_sou_a_fran/" target="_blank" rel="noopener">Instagram</a></td><td><span class="card-badge badge-pendente">PENDENTE</span></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td><div class="influencer-cell"><div class="influencer-avatar" style="background:linear-gradient(135deg,#f9a8d4,#60a5fa);">MO</div><div><div class="influencer-name">Marcelo Oliveira</div><div class="influencer-handle">@marcelogermanota</div></div></div></td><td>Angra / Centro</td><td>beleza, sobrancelhas, negócios</td><td>13.6K</td><td>1.11%</td><td class="warn">neutro</td><td><a class="source-link" href="https://www.instagram.com/marcelogermanota/" target="_blank" rel="noopener">Instagram</a></td><td><span class="card-badge badge-pendente">PENDENTE</span></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td><div class="influencer-cell"><div class="influencer-avatar" style="background:linear-gradient(135deg,#22c55e,#0ea5e9);">RV</div><div><div class="influencer-name">Rafael Vicente</div><div class="influencer-handle">@rafaovp</div></div></div></td><td>Angra / gamer</td><td>streaming, entretenimento</td><td>10.5K</td><td>2.90%</td><td class="warn">neutro</td><td><a class="source-link" href="https://www.instagram.com/rafaovp/" target="_blank" rel="noopener">Instagram</a></td><td><span class="card-badge badge-pendente">PENDENTE</span></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td><div class="influencer-cell"><div class="influencer-avatar" style="background:linear-gradient(135deg,#93c5fd,#fde68a);">AD</div><div><div class="influencer-name">Alberto Dobler</div><div class="influencer-handle">@alberto.doblerneto</div></div></div></td><td>Angra</td><td>segurança pública, policial, família</td><td>9.8K</td><td>4.27%</td><td class="warn">neutro</td><td><a class="source-link" href="https://www.instagram.com/alberto.doblerneto/" target="_blank" rel="noopener">Instagram</a></td><td><span class="card-badge badge-pendente">PENDENTE</span></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td><div class="influencer-cell"><div class="influencer-avatar" style="background:linear-gradient(135deg,#34d399,#a78bfa);">CB</div><div><div class="influencer-name">Cristiane Brasil</div><div class="influencer-handle">@titi_brasil</div></div></div></td><td>Angra</td><td>política municipal, Câmara</td><td>9.1K</td><td>1.50%</td><td class="warn">neutro</td><td><a class="source-link" href="https://www.instagram.com/titi_brasil/" target="_blank" rel="noopener">Instagram</a></td><td><span class="card-badge badge-pendente">PENDENTE</span></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td><div class="influencer-cell"><div class="influencer-avatar" style="background:linear-gradient(135deg,#e879f9,#facc15);">SN</div><div><div class="influencer-name">Steffany Nascimento</div><div class="influencer-handle">@stee__nascimento_</div></div></div></td><td>Angra</td><td>loja, lifestyle, comércio local</td><td>8.3K</td><td>1.07%</td><td class="warn">neutro</td><td><a class="source-link" href="https://www.instagram.com/stee__nascimento_/" target="_blank" rel="noopener">Instagram</a></td><td><span class="card-badge badge-pendente">PENDENTE</span></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td><div class="influencer-cell"><div class="influencer-avatar" style="background:linear-gradient(135deg,#f59e0b,#22c55e);">DT</div><div><div class="influencer-name">Dudu do Turismo</div><div class="influencer-handle">@dududoturismo</div></div></div></td><td>Angra / turismo</td><td>mandato, turismo, inclusão</td><td>8.0K</td><td>1.75%</td><td class="warn">neutro</td><td><a class="source-link" href="https://www.instagram.com/dududoturismo/" target="_blank" rel="noopener">Instagram</a></td><td><span class="card-badge badge-pendente">PENDENTE</span></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+            </tbody>
+          </table>
+          <div class="small-note">Fonte de ranking/métricas: Modash e Favikon. A coleta automática da foto de perfil do Instagram retornou bloqueio HTTP 403; por isso a coluna Foto fica pendente até uso de API autorizada ou upload manual das imagens.</div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Mapa de Ativação por Território</div><span class="card-badge badge-azul">prioridade</span></div>
+            <table class="tbl">
+              <thead><tr><th>Território</th><th>Perfil âncora</th><th>Mensagem indicada</th><th>Risco</th></tr></thead>
+              <tbody>
+                <tr><td>Frade</td><td>@anayadofrade</td><td>Transporte, cotidiano e humor local</td><td class="up">baixo</td></tr>
+                <tr><td>Japuíba</td><td>@duarte_greg</td><td>Segurança, fiscalização e comunidade</td><td class="warn">médio</td></tr>
+                <tr><td>Ilha Grande</td><td>@viniatlantida</td><td>Preservação, turismo e renda limpa</td><td class="up">baixo</td></tr>
+                <tr><td>Centro</td><td>@marcelogermanota</td><td>Comércio, serviços e empreendedorismo</td><td class="warn">médio</td></tr>
+                <tr><td>Angra geral</td><td>@titi_brasil / @dududoturismo</td><td>Legislativo, turismo e entregas públicas</td><td class="warn">médio</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Checklist de Coleta de Fotos</div><span class="card-badge badge-pendente">PENDENTE</span></div>
+          <div class="ai-item"><div class="ai-icon"><i data-lucide="download"></i></div><div class="ai-text"><b>Baixar foto manualmente</b> — salvar em <code>influenciadores/handle.png</code> com autorização ou uso permitido.</div></div>
+          <div class="ai-item"><div class="ai-icon"><i data-lucide="image-plus"></i></div><div class="ai-text"><b>Substituir avatar de iniciais</b> — apontar <code>&lt;img&gt;</code> local no HTML para cada perfil validado.</div></div>
+          <div class="ai-item"><div class="ai-icon"><i data-lucide="badge-check"></i></div><div class="ai-text"><b>Atualizar status</b> — trocar <span class="card-badge badge-pendente">PENDENTE</span> por <span class="card-badge badge-real">REAL</span> somente quando a imagem tiver origem documentada.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ DIÁRIO ══ -->
+      <div id="sec-diario" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Ações hoje</div><div class="kpi-value" style="color:#22c55e;">14</div><div class="kpi-sub up">8 concluídas</div></div>
+          <div class="kpi-card"><div class="kpi-label">Eventos esta semana</div><div class="kpi-value" style="color:#60a5fa;">6</div><div class="kpi-sub" style="color:var(--texto-sec);">2 pendentes</div></div>
+          <div class="kpi-card"><div class="kpi-label">Contatos realizados</div><div class="kpi-value" style="color:#f59e0b;">287</div><div class="kpi-sub up">▲ +42 hoje</div></div>
+          <div class="kpi-card"><div class="kpi-label">Km percorridos</div><div class="kpi-value" style="color:#8b5cf6;">1.847</div><div class="kpi-sub" style="color:var(--texto-sec);">este mês</div></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Linha do Tempo — Hoje 30/04/2026</div><span class="card-badge badge-verde">ao vivo</span></div>
+            <div class="daily-item"><div class="daily-time">08:30</div><div class="daily-dot" style="background:#22c55e;"></div><div class="daily-body"><div class="daily-text">Reunião com líderes comunitários do Frade — 23 presentes, obras discutidas</div><div class="daily-tipo">Reunião · Angra dos Reis · concluído</div></div></div>
+            <div class="daily-item"><div class="daily-time">10:00</div><div class="daily-dot" style="background:#22c55e;"></div><div class="daily-body"><div class="daily-text">Visita ao canteiro da Rodovia dos Búzios — foto no Instagram: 8.4K alcance</div><div class="daily-tipo">Visita / Mídia · Angra dos Reis · concluído</div></div></div>
+            <div class="daily-item"><div class="daily-time">11:30</div><div class="daily-dot" style="background:#22c55e;"></div><div class="daily-body"><div class="daily-text">Entrevista Rádio Costa Verde — 35min · temas: segurança e turismo</div><div class="daily-tipo">Mídia · Costa Verde FM · concluído</div></div></div>
+            <div class="daily-item"><div class="daily-time">14:00</div><div class="daily-dot" style="background:#3b82f6;"></div><div class="daily-body"><div class="daily-text">Almoço com prefeito de Paraty · articulação política</div><div class="daily-tipo">Articulação · Paraty · concluído</div></div></div>
+            <div class="daily-item"><div class="daily-time">16:30</div><div class="daily-dot" style="background:#f59e0b;"></div><div class="daily-body"><div class="daily-text">Live Instagram: educação no Sul Fluminense — em preparação</div><div class="daily-tipo">Pendente · Digital</div></div></div>
+            <div class="daily-item"><div class="daily-time">19:00</div><div class="daily-dot" style="background:#f59e0b;"></div><div class="daily-body"><div class="daily-text">Evento no bairro Balneário — comício de rua, 300 pessoas estimadas</div><div class="daily-tipo">Pendente · Angra dos Reis</div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Produtividade da Semana</div><span class="card-badge badge-azul">métricas</span></div>
+            <div class="chart-wrap" style="height:180px;"><canvas id="cDiario"></canvas></div>
+            <div style="margin-top:14px;">
+              <div class="prog-row"><div class="prog-label">Eventos / Visitas</div><div class="prog-bar"><div class="prog-fill" style="width:80%;background:#22c55e;"></div></div><div class="prog-val up">80%</div></div>
+              <div class="prog-row"><div class="prog-label">Postagens planejadas</div><div class="prog-bar"><div class="prog-fill" style="width:70%;background:#3b82f6;"></div></div><div class="prog-val" style="color:#60a5fa;">70%</div></div>
+              <div class="prog-row"><div class="prog-label">Cabos ativados</div><div class="prog-bar"><div class="prog-fill" style="width:62%;background:#f59e0b;"></div></div><div class="prog-val warn">62%</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ IA PREDITIVA ══ -->
+      <div id="sec-ia" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Previsão de votos</div><div class="kpi-value" style="color:#22c55e;">72.1K</div><div class="kpi-sub up">modelo base mai/26</div></div>
+          <div class="kpi-card"><div class="kpi-label">Prob. de eleição</div><div class="kpi-value" style="color:#22c55e;">82%</div><div class="kpi-sub up">▲ +5pp este mês</div></div>
+          <div class="kpi-card"><div class="kpi-label">Score da campanha</div><div class="kpi-value" style="color:#8b5cf6;">B+</div><div class="kpi-sub up">▲ melhorando</div></div>
+          <div class="kpi-card"><div class="kpi-label">Próxima atualização IA</div><div class="kpi-value" style="color:#60a5fa;">2h</div><div class="kpi-sub" style="color:var(--texto-sec);">ciclo de 6h</div></div>
+        </div>
+        <div class="card mb14">
+          <div class="card-header"><div class="card-title">Sugestões Preditivas da IA — Agora</div><span class="card-badge badge-roxo">Modelo GPE 2026</span></div>
+          <div class="ai-item"><div class="ai-icon"><i data-lucide="sirens"></i></div><div class="ai-text"><b>Ação urgente: Itaguaí e Mangaratiba</b> — Modelo detecta risco de perda de 2 posições se Chico da Roça mantiver crescimento. Recomendado: 2 visitas em 15 dias + ativação de 40 cabos nessas regiões.<span class="ai-tag badge-vermelho">Urgente · 15 dias</span></div></div>
+          <div class="ai-item"><div class="ai-icon"><i data-lucide="trending-up"></i></div><div class="ai-text"><b>Oportunidade no jovem eleitor (16–24)</b> — Segmento com maior crescimento de intenção (+4pp). Produzir conteúdo sobre emprego, educação e turismo. Plataforma-alvo: Instagram Reels e TikTok.<span class="ai-tag badge-verde">Alta prioridade</span></div></div>
+          <div class="ai-item"><div class="ai-icon"><i data-lucide="target"></i></div><div class="ai-text"><b>Bairro Bracuí em queda</b> — Intenção caiu de 51% para 38% nas últimas 3 semanas. Verificar atuação de concorrente e mobilizar liderança comunitária local.<span class="ai-tag badge-amarelo">Atenção · 7 dias</span></div></div>
+          <div class="ai-item"><div class="ai-icon"><i data-lucide="lightbulb"></i></div><div class="ai-text"><b>Janela de mídia: rádio e TV regional</b> — Baixa saturação em rádios do interior (Rio Claro, Paraty). Spots de 30s com foco em segurança maximizariam retorno.<span class="ai-tag badge-azul">Recomendado</span></div></div>
+          <div class="ai-item"><div class="ai-icon"><i data-lucide="handshake"></i></div><div class="ai-text"><b>Aliança estratégica potencial</b> — Modelo identifica 6 vereadores de Angra e Paraty sem candidato federal alinhado. Aproximação pode gerar +5K votos estimados.<span class="ai-tag badge-verde">Oportunidade</span></div></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Projeção de Votos — Cenários</div><span class="card-badge badge-azul">simulação</span></div>
+            <div class="chart-wrap" style="height:220px;"><canvas id="cProjecao"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Drivers de Resultado</div><span class="card-badge badge-verde">peso de cada fator</span></div>
+            <div class="prog-row"><div class="prog-label">Domínio Costa Verde</div><div class="prog-bar"><div class="prog-fill" style="width:88%;background:#22c55e;"></div></div><div class="prog-val up">+28%</div></div>
+            <div class="prog-row"><div class="prog-label">Redes sociais</div><div class="prog-bar"><div class="prog-fill" style="width:64%;background:#3b82f6;"></div></div><div class="prog-val" style="color:#60a5fa;">+18%</div></div>
+            <div class="prog-row"><div class="prog-label">Bolsonaro endorsement</div><div class="prog-bar"><div class="prog-fill" style="width:78%;background:#22c55e;"></div></div><div class="prog-val up">+22%</div></div>
+            <div class="prog-row"><div class="prog-label">Agenda de rua</div><div class="prog-bar"><div class="prog-fill" style="width:52%;background:#f59e0b;"></div></div><div class="prog-val warn">+14%</div></div>
+            <div class="prog-row"><div class="prog-label">Risco Chico da Roça</div><div class="prog-bar"><div class="prog-fill" style="width:38%;background:#ef4444;"></div></div><div class="prog-val down">-8%</div></div>
+            <div class="prog-row"><div class="prog-label">Baixa em 60+ anos</div><div class="prog-bar"><div class="prog-fill" style="width:22%;background:#ef4444;"></div></div><div class="prog-val down">-5%</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ DEMANDAS ══ -->
+      <div id="sec-demandas" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Demandas coletadas</div><div class="kpi-value" style="color:#22c55e;">1.847</div><div class="kpi-sub up">▲ +142 este mês</div></div>
+          <div class="kpi-card"><div class="kpi-label">Categorias</div><div class="kpi-value" style="color:#60a5fa;">7</div><div class="kpi-sub" style="color:var(--texto-sec);">temas principais</div></div>
+          <div class="kpi-card"><div class="kpi-label">NPS eleitoral</div><div class="kpi-value" style="color:#22c55e;">+48</div><div class="kpi-sub up">▲ excelente</div></div>
+          <div class="kpi-card"><div class="kpi-label">Demandas urgentes</div><div class="kpi-value" style="color:#f59e0b;">12</div><div class="kpi-sub warn">aguardando resposta</div></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Principais Demandas Populares</div><span class="card-badge badge-verde">top temas</span></div>
+            <div class="chart-wrap" style="height:240px;"><canvas id="cDemandas"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Pautas por Região</div><span class="card-badge badge-azul">territorializado</span></div>
+            <table class="tbl">
+              <thead><tr><th>Região</th><th>Pauta #1</th><th>Urgência</th></tr></thead>
+              <tbody>
+                <tr><td><b>Angra dos Reis</b></td><td>Saúde (UPA 24h)</td><td class="down">Alta</td></tr>
+                <tr><td>Paraty</td><td>Turismo sustentável</td><td class="warn">Média</td></tr>
+                <tr><td>Mangaratiba</td><td>Segurança pública</td><td class="down">Alta</td></tr>
+                <tr><td>Rio Claro</td><td>Infraestrutura rural</td><td class="warn">Média</td></tr>
+                <tr><td>Itaguaí</td><td>Emprego e porto</td><td class="down">Alta</td></tr>
+                <tr><td>Bracuí</td><td>Asfalto / mobilidade</td><td class="down">Alta</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card mb14">
+          <div class="card-header"><div class="card-title">Necessidades e Desejos por Bairro</div><span class="card-badge badge-real">fontes públicas + estimativa</span></div>
+          <table class="tbl">
+            <thead><tr><th>Cidade</th><th>Bairro / Região</th><th>Necessidades</th><th>Desejos</th><th>Fonte</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Angra dos Reis</td><td><b>Belém / Grande Japuíba</b></td><td><span class="need-pill">drenagem</span><span class="need-pill">iluminação</span><span class="need-pill">transporte</span></td><td><span class="need-pill">praças vivas</span><span class="need-pill">curso profissional</span></td><td><a class="source-link" href="https://portal.angra.rj.gov.br/noticia.asp?IndexSigla=SGRI&amp;vid_noticia=65786" target="_blank" rel="noopener">PCA Belém</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>Angra dos Reis</td><td><b>Centro / Morros</b></td><td><span class="need-pill">áreas de risco</span><span class="need-pill">contenção</span><span class="need-pill">segurança</span></td><td><span class="need-pill">regularização</span><span class="need-pill">turismo histórico</span></td><td><a class="source-link" href="https://angra.rj.gov.br/pmrr" target="_blank" rel="noopener">PMRR</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>Angra dos Reis</td><td><b>Japuíba</b></td><td><span class="need-pill">mobilidade</span><span class="need-pill">saúde</span><span class="need-pill">segurança</span></td><td><span class="need-pill">emprego local</span><span class="need-pill">esporte jovem</span></td><td><a class="source-link" href="https://angra.rj.gov.br/noticias/13-06-2022/plano-diretor-on-line" target="_blank" rel="noopener">Plano Diretor</a></td><td><span class="card-badge badge-est">ESTIMADO</span></td></tr>
+              <tr><td>Angra dos Reis</td><td><b>Frade</b></td><td><span class="need-pill">transporte</span><span class="need-pill">atendimento de saúde</span><span class="need-pill">saneamento</span></td><td><span class="need-pill">renda turística</span><span class="need-pill">qualificação</span></td><td><a class="source-link" href="https://angra.rj.gov.br/noticias/13-06-2022/plano-diretor-on-line" target="_blank" rel="noopener">Plano Diretor</a></td><td><span class="card-badge badge-est">ESTIMADO</span></td></tr>
+              <tr><td>Angra dos Reis</td><td><b>Parque Mambucaba</b></td><td><span class="need-pill">desassoreamento</span><span class="need-pill">drenagem</span><span class="need-pill">coleta</span></td><td><span class="need-pill">lazer</span><span class="need-pill">economia do mar</span></td><td><a class="source-link" href="https://rjcostaverde.com.br/2022/05/10/angra-dos-reis-quinze-bairros-terao-rios-desassoreados/" target="_blank" rel="noopener">RJ Costa Verde</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>Angra dos Reis</td><td><b>Bracuí</b></td><td><span class="need-pill">rio/enchente</span><span class="need-pill">asfalto</span><span class="need-pill">iluminação</span></td><td><span class="need-pill">turismo comunitário</span><span class="need-pill">píer organizado</span></td><td><a class="source-link" href="https://rjcostaverde.com.br/2022/05/10/angra-dos-reis-quinze-bairros-terao-rios-desassoreados/" target="_blank" rel="noopener">desassoreamento</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>Angra dos Reis</td><td><b>Ilha Grande / Vila do Abraão</b></td><td><span class="need-pill">resíduos</span><span class="need-pill">fluxo turístico</span><span class="need-pill">saneamento</span></td><td><span class="need-pill">turismo sustentável</span><span class="need-pill">preservação</span></td><td><a class="source-link" href="https://portal.angra.rj.gov.br/downloads/SMA/Projeto-Orla/AudienciaPublica/Diagnostico-Participativo-de-Angra-dos-Reis.pdf" target="_blank" rel="noopener">Projeto Orla</a></td><td><span class="card-badge badge-real">REAL</span></td></tr>
+              <tr><td>Paraty</td><td><b>Centro histórico / costeira</b></td><td><span class="need-pill">mobilidade turística</span><span class="need-pill">segurança</span></td><td><span class="need-pill">renda criativa</span><span class="need-pill">cultura</span></td><td>escuta regional</td><td><span class="card-badge badge-est">ESTIMADO</span></td></tr>
+              <tr><td>Mangaratiba</td><td><b>Centro / Itacuruçá</b></td><td><span class="need-pill">segurança</span><span class="need-pill">transporte</span></td><td><span class="need-pill">turismo náutico</span><span class="need-pill">orla ativa</span></td><td>escuta regional</td><td><span class="card-badge badge-est">ESTIMADO</span></td></tr>
+              <tr><td>Itaguaí</td><td><b>Centro / porto</b></td><td><span class="need-pill">emprego</span><span class="need-pill">qualificação</span><span class="need-pill">segurança</span></td><td><span class="need-pill">ponte com setor portuário</span></td><td>escuta regional</td><td><span class="card-badge badge-est">ESTIMADO</span></td></tr>
+            </tbody>
+          </table>
+          <div class="small-note">As fontes públicas indicam temas de consulta e programas de escuta; volumes e priorização fina por bairro ainda dependem de questionário local ou base interna.</div>
+        </div>
+      </div>
+
+      <!-- ══ FINANCEIRO ══ -->
+      <div id="sec-financeiro" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Budget total</div><div class="kpi-value" style="color:#22c55e;">R$ 2.8M</div><div class="kpi-sub" style="color:var(--texto-sec);">limite FUNDO ELEITORAL</div></div>
+          <div class="kpi-card"><div class="kpi-label">Gasto até hoje</div><div class="kpi-value" style="color:#f59e0b;">R$ 1.14M</div><div class="kpi-sub warn">41% do budget</div></div>
+          <div class="kpi-card"><div class="kpi-label">Previsão de gasto</div><div class="kpi-value" style="color:#60a5fa;">R$ 2.4M</div><div class="kpi-sub" style="color:var(--texto-sec);">85% do total</div></div>
+          <div class="kpi-card"><div class="kpi-label">ROI / voto estimado</div><div class="kpi-value" style="color:#22c55e;">R$ 16,70</div><div class="kpi-sub up">▲ eficiência ok</div></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Distribuição do Budget</div><span class="card-badge badge-azul">por categoria</span></div>
+            <div class="chart-wrap" style="height:220px;"><canvas id="cBudget"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Fluxo de Gastos Mensais</div><span class="card-badge badge-verde">evolução</span></div>
+            <div class="chart-wrap" style="height:220px;"><canvas id="cGastos"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ CANDIDATOS ══ -->
+      <div id="sec-candidatos" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Candidatos monitorados</div><div class="kpi-value" style="color:#60a5fa;">48</div><div class="kpi-sub" style="color:var(--texto-sec);">na disputa federal RJ</div></div>
+          <div class="kpi-card"><div class="kpi-label">Vagas disponíveis</div><div class="kpi-value" style="color:#22c55e;">46</div><div class="kpi-sub" style="color:var(--texto-sec);">deputados federais RJ</div></div>
+          <div class="kpi-card"><div class="kpi-label">Adversários diretos</div><div class="kpi-value" style="color:#ef4444;">12</div><div class="kpi-sub down">disputa Costa Verde</div></div>
+          <div class="kpi-card"><div class="kpi-label">Aliados potenciais</div><div class="kpi-value" style="color:#22c55e;">7</div><div class="kpi-sub up">alinhamento PL</div></div>
+        </div>
+        <div class="grid-cand">
+          <div class="cand-card destaque" data-candidate-key="renato_araujo" onclick="showCandidateDetail('renato_araujo')">
+            <div class="cand-head">
+              <div class="cand-photo-wrap"><img class="cand-photo" src="candidatos/renato_araujo_PL.png" alt="Retrato de Renato Araújo"></div>
+              <div class="cand-main">
+                <div class="cand-top">
+                  <div class="cand-avatar" style="background:#1a3a1a;color:#22c55e;">RA</div>
+                  <div style="flex:1"><div class="cand-nome" style="color:#22c55e;">Renato Araújo</div><div class="cand-partido">PL · Angra dos Reis</div></div>
+                  <span class="card-badge badge-verde" style="font-size:9px;">#4° ▲</span>
+                </div>
+                <div class="cand-stat"><span>Intenção de voto</span><span class="up">8.7%</span></div>
+                <div class="cand-stat"><span>Tendência 30d</span><span class="up">▲ +1.2pp</span></div>
+                <div class="cand-stat"><span>Redes (total)</span><span>99.1K</span></div>
+                <div class="cand-stat"><span>Eventos mês</span><span>18</span></div>
+                <div class="cand-stat"><span>Prob. eleição</span><span class="up" style="font-size:13px;">82%</span></div>
+              </div>
+            </div>
+            <div class="kpi-bar" style="margin-top:8px;"><div class="kpi-fill" style="width:82%;background:#22c55e;"></div></div>
+          </div>
+          <div class="cand-card" data-candidate-key="laura_carneiro" onclick="showCandidateDetail('laura_carneiro')">
+            <div class="cand-head">
+              <div class="cand-photo-wrap"><img class="cand-photo" src="candidatos/laura_carneiro_psd.png" alt="Retrato de Laura Carneiro"></div>
+              <div class="cand-main">
+                <div class="cand-top">
+                  <div class="cand-avatar" style="background:#3a2a0a;color:#f59e0b;">LC</div>
+                  <div style="flex:1"><div class="cand-nome">Laura Carneiro</div><div class="cand-partido">PSD · RJ</div></div>
+                  <span class="card-badge badge-amarelo" style="font-size:9px;">#1°</span>
+                </div>
+                <div class="cand-stat"><span>Intenção de voto</span><span class="warn">10.5%</span></div>
+                <div class="cand-stat"><span>Tendência 30d</span><span class="warn">→ estável</span></div>
+                <div class="cand-stat"><span>Redes (total)</span><span>142K</span></div>
+                <div class="cand-stat"><span>Eventos mês</span><span>24</span></div>
+                <div class="cand-stat"><span>Prob. eleição</span><span class="up" style="font-size:13px;">94%</span></div>
+              </div>
+            </div>
+            <div class="kpi-bar" style="margin-top:8px;"><div class="kpi-fill" style="width:94%;background:#f59e0b;"></div></div>
+          </div>
+          <div class="cand-card" data-candidate-key="marcelo_crivella" onclick="showCandidateDetail('marcelo_crivella')">
+            <div class="cand-head">
+              <div class="cand-photo-wrap"><img class="cand-photo" src="candidatos/marcelo_crivela_republicanos.png" alt="Retrato de Marcelo Crivella"></div>
+              <div class="cand-main">
+                <div class="cand-top">
+                  <div class="cand-avatar" style="background:#1a2a3a;color:#60a5fa;">MC</div>
+                  <div style="flex:1"><div class="cand-nome">Marcelo Crivella</div><div class="cand-partido">Republicanos · RJ</div></div>
+                  <span class="card-badge badge-azul" style="font-size:9px;">#2°</span>
+                </div>
+                <div class="cand-stat"><span>Intenção de voto</span><span style="color:#60a5fa;">9.8%</span></div>
+                <div class="cand-stat"><span>Tendência 30d</span><span class="up">▲ +0.4pp</span></div>
+                <div class="cand-stat"><span>Redes (total)</span><span>88K</span></div>
+                <div class="cand-stat"><span>Eventos mês</span><span>21</span></div>
+                <div class="cand-stat"><span>Prob. eleição</span><span class="up" style="font-size:13px;">91%</span></div>
+              </div>
+            </div>
+            <div class="kpi-bar" style="margin-top:8px;"><div class="kpi-fill" style="width:91%;background:#3b82f6;"></div></div>
+          </div>
+          <div class="cand-card" data-candidate-key="dr_luizinho" onclick="showCandidateDetail('dr_luizinho')">
+            <div class="cand-head">
+              <div class="cand-photo-wrap"><img class="cand-photo" src="candidatos/dr_luizinho_psb.png" alt="Retrato de Dr. Luizinho"></div>
+              <div class="cand-main">
+                <div class="cand-top">
+                  <div class="cand-avatar" style="background:#3a1a1a;color:#ef4444;">DL</div>
+                  <div style="flex:1"><div class="cand-nome">Dr. Luizinho</div><div class="cand-partido">PSB · RJ</div></div>
+                  <span class="card-badge badge-vermelho" style="font-size:9px;">#3° ▲▲</span>
+                </div>
+                <div class="cand-stat"><span>Intenção de voto</span><span class="down">9.2%</span></div>
+                <div class="cand-stat"><span>Tendência 30d</span><span class="down">▲ +1.8pp</span></div>
+                <div class="cand-stat"><span>Redes (total)</span><span>61K</span></div>
+                <div class="cand-stat"><span>Eventos mês</span><span>31</span></div>
+                <div class="cand-stat"><span>Prob. eleição</span><span class="warn" style="font-size:13px;">87%</span></div>
+              </div>
+            </div>
+            <div class="kpi-bar" style="margin-top:8px;"><div class="kpi-fill" style="width:87%;background:#ef4444;"></div></div>
+          </div>
+          <div class="cand-card" data-candidate-key="celia_jordao" onclick="showCandidateDetail('celia_jordao')">
+            <div class="cand-head">
+              <div class="cand-photo-wrap"><img class="cand-photo" src="candidatos/celia_jordao_PL.png" alt="Retrato de Célia Jordão"></div>
+              <div class="cand-main">
+                <div class="cand-top">
+                  <div class="cand-avatar" style="background:#3a1a2a;color:#f472b6;">CJ</div>
+                  <div style="flex:1"><div class="cand-nome">Célia Jordão</div><div class="cand-partido">PL → PSD · RJ</div></div>
+                  <span class="card-badge badge-amarelo" style="font-size:9px;">#5°</span>
+                </div>
+                <div class="cand-stat"><span>Intenção de voto</span><span style="color:#f472b6;">7.9%</span></div>
+                <div class="cand-stat"><span>Tendência 30d</span><span class="down">▼ -0.3pp</span></div>
+                <div class="cand-stat"><span>Redes (total)</span><span>210K</span></div>
+                <div class="cand-stat"><span>Eventos mês</span><span>28</span></div>
+                <div class="cand-stat"><span>Prob. eleição</span><span class="warn" style="font-size:13px;">72%</span></div>
+              </div>
+            </div>
+            <div class="kpi-bar" style="margin-top:8px;"><div class="kpi-fill" style="width:72%;background:#f472b6;"></div></div>
+          </div>
+          <div class="cand-card" data-candidate-key="jorginho_brum" onclick="showCandidateDetail('jorginho_brum')">
+            <div class="cand-head">
+              <div class="cand-photo-wrap"><img class="cand-photo" src="candidatos/jorginho_brum.png" alt="Retrato de Jorginho Brum"></div>
+              <div class="cand-main">
+                <div class="cand-top">
+                  <div class="cand-avatar" style="background:#1a3a2a;color:#34d399;">JB</div>
+                  <div style="flex:1"><div class="cand-nome">Jorginho Brum</div><div class="cand-partido">MDB · RJ</div></div>
+                  <span class="card-badge badge-cinza" style="font-size:9px;">#6°</span>
+                </div>
+                <div class="cand-stat"><span>Intenção de voto</span><span>7.4%</span></div>
+                <div class="cand-stat"><span>Tendência 30d</span><span class="down">▼ -0.7pp</span></div>
+                <div class="cand-stat"><span>Redes (total)</span><span>55K</span></div>
+                <div class="cand-stat"><span>Eventos mês</span><span>16</span></div>
+                <div class="cand-stat"><span>Prob. eleição</span><span class="warn" style="font-size:13px;">64%</span></div>
+              </div>
+            </div>
+            <div class="kpi-bar" style="margin-top:8px;"><div class="kpi-fill" style="width:64%;background:#34d399;"></div></div>
+          </div>
+          <div class="cand-card" data-candidate-key="aureo_ribeiro" onclick="showCandidateDetail('aureo_ribeiro')">
+            <div class="cand-head">
+              <div class="cand-photo-wrap"><img class="cand-photo" src="candidatos/aureo_ribeiro_pl.png" alt="Retrato de Áureo Ribeiro"></div>
+              <div class="cand-main">
+                <div class="cand-top">
+                  <div class="cand-avatar" style="background:#31214a;color:#c084fc;">AR</div>
+                  <div style="flex:1"><div class="cand-nome">Áureo Ribeiro</div><div class="cand-partido">PL · RJ</div></div>
+                  <span class="card-badge badge-roxo" style="font-size:9px;">#7°</span>
+                </div>
+                <div class="cand-stat"><span>Intenção de voto</span><span style="color:#c084fc;">6.9%</span></div>
+                <div class="cand-stat"><span>Tendência 30d</span><span class="up">▲ +0.6pp</span></div>
+                <div class="cand-stat"><span>Redes (total)</span><span>73K</span></div>
+                <div class="cand-stat"><span>Eventos mês</span><span>17</span></div>
+                <div class="cand-stat"><span>Prob. eleição</span><span class="warn" style="font-size:13px;">61%</span></div>
+              </div>
+            </div>
+            <div class="kpi-bar" style="margin-top:8px;"><div class="kpi-fill" style="width:61%;background:#a855f7;"></div></div>
+          </div>
+          <div class="cand-card" data-candidate-key="bebeto" onclick="showCandidateDetail('bebeto')">
+            <div class="cand-head">
+              <div class="cand-photo-wrap"><img class="cand-photo" src="candidatos/bebeto_PSC.png" alt="Retrato de Bebeto"></div>
+              <div class="cand-main">
+                <div class="cand-top">
+                  <div class="cand-avatar" style="background:#162738;color:#7dd3fc;">BE</div>
+                  <div style="flex:1"><div class="cand-nome">Bebeto</div><div class="cand-partido">PSC · RJ</div></div>
+                  <span class="card-badge badge-azul" style="font-size:9px;">#8°</span>
+                </div>
+                <div class="cand-stat"><span>Intenção de voto</span><span style="color:#7dd3fc;">6.4%</span></div>
+                <div class="cand-stat"><span>Tendência 30d</span><span class="warn">→ estável</span></div>
+                <div class="cand-stat"><span>Redes (total)</span><span>68K</span></div>
+                <div class="cand-stat"><span>Eventos mês</span><span>14</span></div>
+                <div class="cand-stat"><span>Prob. eleição</span><span class="warn" style="font-size:13px;">58%</span></div>
+              </div>
+            </div>
+            <div class="kpi-bar" style="margin-top:8px;"><div class="kpi-fill" style="width:58%;background:#38bdf8;"></div></div>
+          </div>
+          <div class="cand-card" data-candidate-key="carlos_jordy" onclick="showCandidateDetail('carlos_jordy')">
+            <div class="cand-head">
+              <div class="cand-photo-wrap"><img class="cand-photo" src="candidatos/carlos_jordy_PL.png" alt="Retrato de Carlos Jordy"></div>
+              <div class="cand-main">
+                <div class="cand-top">
+                  <div class="cand-avatar" style="background:#3a2612;color:#fdba74;">CJ</div>
+                  <div style="flex:1"><div class="cand-nome">Carlos Jordy</div><div class="cand-partido">PL · RJ</div></div>
+                  <span class="card-badge badge-amarelo" style="font-size:9px;">#9°</span>
+                </div>
+                <div class="cand-stat"><span>Intenção de voto</span><span style="color:#fdba74;">6.0%</span></div>
+                <div class="cand-stat"><span>Tendência 30d</span><span class="up">▲ +0.2pp</span></div>
+                <div class="cand-stat"><span>Redes (total)</span><span>81K</span></div>
+                <div class="cand-stat"><span>Eventos mês</span><span>19</span></div>
+                <div class="cand-stat"><span>Prob. eleição</span><span class="warn" style="font-size:13px;">56%</span></div>
+              </div>
+            </div>
+            <div class="kpi-bar" style="margin-top:8px;"><div class="kpi-fill" style="width:56%;background:#fb923c;"></div></div>
+          </div>
+          <div class="cand-card" data-candidate-key="chico_alencar" onclick="showCandidateDetail('chico_alencar')">
+            <div class="cand-head">
+              <div class="cand-photo-wrap"><img class="cand-photo" src="candidatos/chico_alencar_PSOL.png" alt="Retrato de Chico Alencar"></div>
+              <div class="cand-main">
+                <div class="cand-top">
+                  <div class="cand-avatar" style="background:#1b3b34;color:#6ee7b7;">CA</div>
+                  <div style="flex:1"><div class="cand-nome">Chico Alencar</div><div class="cand-partido">PSOL · RJ</div></div>
+                  <span class="card-badge badge-verde" style="font-size:9px;">#10°</span>
+                </div>
+                <div class="cand-stat"><span>Intenção de voto</span><span style="color:#6ee7b7;">5.6%</span></div>
+                <div class="cand-stat"><span>Tendência 30d</span><span class="down">▼ -0.4pp</span></div>
+                <div class="cand-stat"><span>Redes (total)</span><span>64K</span></div>
+                <div class="cand-stat"><span>Eventos mês</span><span>12</span></div>
+                <div class="cand-stat"><span>Prob. eleição</span><span class="warn" style="font-size:13px;">49%</span></div>
+              </div>
+            </div>
+            <div class="kpi-bar" style="margin-top:8px;"><div class="kpi-fill" style="width:49%;background:#10b981;"></div></div>
+          </div>
+          <div class="cand-card" data-candidate-key="chris_tonietto" onclick="showCandidateDetail('chris_tonietto')">
+            <div class="cand-head">
+              <div class="cand-photo-wrap"><img class="cand-photo" src="candidatos/chris_tonieto_PL.png" alt="Retrato de Chris Tonietto"></div>
+              <div class="cand-main">
+                <div class="cand-top">
+                  <div class="cand-avatar" style="background:#3c1d1d;color:#fca5a5;">CT</div>
+                  <div style="flex:1"><div class="cand-nome">Chris Tonietto</div><div class="cand-partido">PL · RJ</div></div>
+                  <span class="card-badge badge-vermelho" style="font-size:9px;">#11°</span>
+                </div>
+                <div class="cand-stat"><span>Intenção de voto</span><span class="down">5.1%</span></div>
+                <div class="cand-stat"><span>Tendência 30d</span><span class="up">▲ +0.9pp</span></div>
+                <div class="cand-stat"><span>Redes (total)</span><span>47K</span></div>
+                <div class="cand-stat"><span>Eventos mês</span><span>22</span></div>
+                <div class="cand-stat"><span>Prob. eleição</span><span class="warn" style="font-size:13px;">44%</span></div>
+              </div>
+            </div>
+            <div class="kpi-bar" style="margin-top:8px;"><div class="kpi-fill" style="width:44%;background:#dc2626;"></div></div>
+          </div>
+          <div class="cand-card" data-candidate-key="delegado_furtado" onclick="showCandidateDetail('delegado_furtado')">
+            <div class="cand-head">
+              <div class="cand-photo-wrap"><img class="cand-photo" src="candidatos/delegado_furtado_PL.png" alt="Retrato de Delegado Antônio Furtado"></div>
+              <div class="cand-main">
+                <div class="cand-top">
+                  <div class="cand-avatar" style="background:#213a1e;color:#86efac;">AF</div>
+                  <div style="flex:1"><div class="cand-nome">Delegado Antônio Furtado</div><div class="cand-partido">PL · RJ</div></div>
+                  <span class="card-badge badge-cinza" style="font-size:9px;">#12°</span>
+                </div>
+                <div class="cand-stat"><span>Intenção de voto</span><span>4.8%</span></div>
+                <div class="cand-stat"><span>Tendência 30d</span><span class="warn">→ estável</span></div>
+                <div class="cand-stat"><span>Redes (total)</span><span>39K</span></div>
+                <div class="cand-stat"><span>Eventos mês</span><span>10</span></div>
+                <div class="cand-stat"><span>Prob. eleição</span><span class="warn" style="font-size:13px;">41%</span></div>
+              </div>
+            </div>
+            <div class="kpi-bar" style="margin-top:8px;"><div class="kpi-fill" style="width:41%;background:#65a30d;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="sec-candidato-detalhe" class="section">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Monitoramento Individual do Candidato</div><span class="card-badge badge-azul">clique em um card</span></div>
+          <div class="detail-hero">
+            <img id="detailPhoto" class="detail-photo" src="candidatos/renato_araujo_PL.png" alt="Foto do candidato">
+            <div>
+              <div id="detailTitle" class="detail-title">Renato Araújo</div>
+              <div id="detailSub" class="detail-sub">PL · RJ · Costa Verde</div>
+              <div id="detailMeta" class="detail-meta"></div>
+            </div>
+          </div>
+          <div class="detail-grid">
+            <div class="card">
+              <div class="card-header"><div class="card-title">Ações Recentes</div><span class="card-badge badge-real">monitoramento de campo</span></div>
+              <div id="detailActions" class="detail-list"></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">Melhor Rendimento</div><span class="card-badge badge-est">mapa competitivo</span></div>
+              <div id="detailPerformance" class="detail-list"></div>
+            </div>
+          </div>
+          <div class="grid2" style="margin-top:12px;">
+            <div class="card">
+              <div class="card-header"><div class="card-title">Próximos Passos do Adversário</div><span class="card-badge badge-amarelo">janela de observação</span></div>
+              <table class="tbl">
+                <thead><tr><th>Quando</th><th>Ação</th><th>Local</th><th>Status</th></tr></thead>
+                <tbody id="detailNextMoves"></tbody>
+              </table>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">Fontes e Referências</div><span class="card-badge badge-real">base pública</span></div>
+              <div id="detailSources" class="detail-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ EVENTOS ══ -->
+      <div id="sec-eventos" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Eventos este mês</div><div class="kpi-value" style="color:#22c55e;">18</div><div class="kpi-sub up">6 esta semana</div></div>
+          <div class="kpi-card"><div class="kpi-label">Pessoas alcançadas</div><div class="kpi-value" style="color:#60a5fa;">4.2K</div><div class="kpi-sub up">▲ presencial</div></div>
+          <div class="kpi-card"><div class="kpi-label">Próximo evento</div><div class="kpi-value" style="color:#f59e0b;">Hoje</div><div class="kpi-sub warn">19h · Balneário</div></div>
+          <div class="kpi-card"><div class="kpi-label">Municípios mai/26</div><div class="kpi-value" style="color:#22c55e;">8</div><div class="kpi-sub" style="color:var(--texto-sec);">cobertos na programação</div></div>
+        </div>
+        <div class="card mb14">
+          <div class="card-header"><div class="card-title">Agenda de Maio 2026</div><span class="card-badge badge-azul">programação</span></div>
+          <table class="tbl">
+            <thead><tr><th>Data</th><th>Evento</th><th>Local</th><th>Tipo</th><th>Presença Est.</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>01/05</td><td>Comício do Trabalhador</td><td>Angra dos Reis — Centro</td><td>Comício</td><td>800 pessoas</td><td><span class="card-badge badge-verde">Confirmado</span></td></tr>
+              <tr><td>03/05</td><td>Visita Escola Estadual</td><td>Mambucaba</td><td>Visita</td><td>200 pessoas</td><td><span class="card-badge badge-verde">Confirmado</span></td></tr>
+              <tr><td>06/05</td><td>Reunião com pescadores</td><td>Paraty</td><td>Reunião</td><td>80 pessoas</td><td><span class="card-badge badge-verde">Confirmado</span></td></tr>
+              <tr><td>08/05</td><td>Live: Saúde e Educação</td><td>Instagram / YouTube</td><td>Digital</td><td>10K alcance</td><td><span class="card-badge badge-amarelo">Planejado</span></td></tr>
+              <tr><td>10/05</td><td>Visita a Mangaratiba</td><td>Mangaratiba — Centro</td><td>Visita</td><td>150 pessoas</td><td><span class="card-badge badge-amarelo">Planejado</span></td></tr>
+              <tr><td>15/05</td><td>Debate Político Regional</td><td>Angra dos Reis</td><td>Debate</td><td>500 pessoas</td><td><span class="card-badge badge-azul">A confirmar</span></td></tr>
+              <tr><td>20/05</td><td>Caminhada Itaguaí</td><td>Itaguaí — Centro</td><td>Caminhada</td><td>300 pessoas</td><td><span class="card-badge badge-azul">A confirmar</span></td></tr>
+              <tr><td>25/05</td><td>Plenária Costa Verde</td><td>Rio Claro</td><td>Plenária</td><td>120 pessoas</td><td><span class="card-badge badge-cinza">Proposto</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mockup-warning"><strong>MOCKUP DE MODELO A SER CONSTRUÍDO COM DADOS NÃO REAIS</strong></div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+/* ── NAVEGAÇÃO ── */
+const pageTitles = {
+  dashboard:   ['Dashboard Geral', 'Eleições Federais 2026 · Deputado Federal · Rio de Janeiro / Angra dos Reis'],
+  pesquisas:   ['Pesquisas Eleitorais', 'Institutos · Rankings · Histórico e Projeções'],
+  territorios: ['Territórios e Bairros', 'Costa Verde · Angra dos Reis · Faixas Etárias e Flutuação'],
+  concorrentes:['Análise de Concorrentes', 'Monitoramento em tempo real dos adversários na disputa federal'],
+  redes:       ['Redes Sociais', 'Facebook · Instagram · X · WhatsApp · Engajamento e Sentimento'],
+  midia:       ['Mídia e Imprensa', 'Clipping · Monitoramento · Tom e Cobertura'],
+  influenciadores:['Influenciadores Locais', 'Instagram · Bairro · Alcance · Afinidade e Ativação Territorial'],
+  diario:      ['Diário de Campanha', 'Acompanhamento diário de atividades, agenda e produtividade'],
+  ia:          ['Inteligência Artificial Preditiva', 'Modelo GPE 2026 · Projeções · Sugestões e Alertas'],
+  demandas:    ['Demandas Populares', 'Temas · Regiões · NPS Eleitoral e Urgências'],
+  financeiro:  ['Gestão Financeira', 'Budget · Gastos · ROI e Fluxo de Caixa Eleitoral'],
+  candidatos:  ['Todos os Candidatos', 'Monitoramento completo de candidatos concorrentes e aliados'],
+  'candidato-detalhe': ['Monitoramento por Candidato', 'Ações, praça forte, agenda e desempenho territorial de cada concorrente'],
+  eventos:     ['Agenda de Eventos', 'Comícios · Visitas · Lives · Debates programados'],
+};
+
+const candidateDetails = {
+  renato_araujo: {
+    nome: 'Renato Araújo',
+    partido: 'PL · RJ · Costa Verde',
+    foto: 'candidatos/renato_araujo_PL.png',
+    meta: ['8.7% intenção', 'Angra 88%', 'digital 99.1K'],
+    acoes: [
+      ['30/04', 'Entrevista em rádio regional sobre segurança e turismo', 'Costa Verde FM'],
+      ['29/04', 'Reunião com lideranças do Frade e agenda de bairro', 'Frade'],
+      ['27/04', 'Movimento em redes com pauta pró-Bolsonaro e federal', 'Instagram']
+    ],
+    rendimento: [
+      ['Melhor praça', 'Angra dos Reis · Centro e Perequê'],
+      ['Expansão imediata', 'Paraty e Rio Claro'],
+      ['Risco competitivo', 'Itaguaí e Mangaratiba']
+    ],
+    proximos: [
+      ['01/05', 'Comício do Trabalhador', 'Centro de Angra', 'confirmado'],
+      ['03/05', 'Visita escolar', 'Mambucaba', 'confirmado'],
+      ['08/05', 'Live de saúde e educação', 'digital', 'planejado']
+    ],
+    fontes: [
+      ['Perfil oficial', 'https://www.instagram.com/renatoaraujorj/'],
+      ['Correio da Manhã', 'https://www.correiodamanha.com.br/correio-sul-fluminense/regiao-do-vale/2025/03/190836-angra-empresario-pretende-pleitear-vaga-para-federal.html'],
+      ['O Dia', 'https://odia.ig.com.br/angra-dos-reis/2025/08/7107057-empresario-angrense-aliado-de-bolsonaro-tem-autorizacao-do-stf-para-visitar-o-ex-presidente.html']
+    ]
+  },
+  laura_carneiro: {
+    nome: 'Laura Carneiro',
+    partido: 'PSD · RJ',
+    foto: 'candidatos/laura_carneiro_psd.png',
+    meta: ['10.5% intenção', 'capital e Zona Sul', 'agenda institucional forte'],
+    acoes: [
+      ['semana atual', 'Articulação com bases tradicionais do PSD', 'capital'],
+      ['últimos 15 dias', 'Agenda legislativa e encontro com segmentos profissionais', 'Grande Rio'],
+      ['monitoramento', 'Menções em veículos políticos e contatos partidários', 'RJ']
+    ],
+    rendimento: [['Melhor praça', 'capital / Zona Sul'], ['Boa retenção', 'Baixada urbana'], ['Menor presença', 'Costa Verde']],
+    proximos: [['próximos dias', 'rodada de encontros setoriais', 'Rio de Janeiro', 'estimado'], ['janela de 15 dias', 'agenda partidária', 'Grande Rio', 'estimado'], ['monitoramento', 'movimento digital segmentado', 'Instagram/Facebook', 'estimado']],
+    fontes: [['Câmara dos Deputados', 'https://www.camara.leg.br/deputados/74665'], ['Perfil Instagram', 'https://www.instagram.com/lauracarneirorj/']]
+  },
+  marcelo_crivella: {
+    nome: 'Marcelo Crivella',
+    partido: 'Republicanos · RJ',
+    foto: 'candidatos/marcelo_crivela_republicanos.png',
+    meta: ['9.8% intenção', 'evangélico / capital', 'alta lembrança de nome'],
+    acoes: [['semana atual', 'Presença em redes e nichos evangélicos', 'capital'], ['últimos 10 dias', 'agenda institucional e entrevistas', 'Grande Rio'], ['monitoramento', 'falas de reposicionamento eleitoral', 'digital']],
+    rendimento: [['Melhor praça', 'capital e Zona Oeste'], ['Boa conversão', 'eleitorado evangélico'], ['Menor aderência', 'Costa Verde']],
+    proximos: [['janela de 7 dias', 'visitas a bases religiosas', 'capital', 'estimado'], ['janela de 15 dias', 'gravações e entrevistas', 'digital', 'estimado'], ['monitoramento', 'agenda partidária', 'RJ', 'estimado']],
+    fontes: [['Wikipedia', 'https://pt.wikipedia.org/wiki/Marcelo_Crivella'], ['Instagram', 'https://www.instagram.com/marcelo_crivella/']]
+  },
+  dr_luizinho: {
+    nome: 'Dr. Luizinho',
+    partido: 'PSB · RJ',
+    foto: 'candidatos/dr_luizinho_psb.png',
+    meta: ['9.2% intenção', 'saúde como eixo', 'crescimento recente'],
+    acoes: [['últimos dias', 'agenda em saúde e hospitais', 'Baixada / capital'], ['semana atual', 'contato com prefeitos e secretários', 'interior'], ['monitoramento', 'produção de conteúdo sobre gestão pública', 'digital']],
+    rendimento: [['Melhor praça', 'Baixada e interior de saúde regional'], ['Ganho recente', 'eleitor técnico / saúde'], ['Menor aderência', 'bairros costeiros']],
+    proximos: [['janela de 7 dias', 'reuniões de saúde regional', 'Baixada', 'estimado'], ['janela de 10 dias', 'agenda com lideranças municipais', 'interior', 'estimado'], ['monitoramento', 'impulso em vídeo', 'Instagram', 'estimado']],
+    fontes: [['Alerj / histórico público', 'https://www.instagram.com/dr.luizinho/']]
+  },
+  celia_jordao: {
+    nome: 'Célia Jordão',
+    partido: 'PL para PSD · RJ',
+    foto: 'candidatos/celia_jordao_PL.png',
+    meta: ['7.9% intenção', 'Sul Fluminense', 'rede local consolidada'],
+    acoes: [['semana atual', 'encontros com lideranças do Sul Fluminense', 'Barra do Piraí / entorno'], ['últimos dias', 'presença em rádios e agendas municipais', 'interior'], ['monitoramento', 'transição e reposicionamento partidário', 'RJ']],
+    rendimento: [['Melhor praça', 'Sul Fluminense'], ['Boa leitura', 'eleitorado municipalista'], ['Menor presença', 'Angra e litoral sul']],
+    proximos: [['janela de 15 dias', 'agenda municipalista', 'Sul Fluminense', 'estimado'], ['monitoramento', 'rodada de entrevistas', 'rádio local', 'estimado'], ['janela de 30 dias', 'fortalecimento de base', 'interior', 'estimado']],
+    fontes: [['Perfil público', 'https://www.instagram.com/celiajordaorj/']]
+  },
+  jorginho_brum: {
+    nome: 'Jorginho Brum',
+    partido: 'MDB · RJ',
+    foto: 'candidatos/jorginho_brum.png',
+    meta: ['7.4% intenção', 'interior moderado', 'agenda de proximidade'],
+    acoes: [['semana atual', 'contatos com bases municipais', 'interior'], ['últimos 15 dias', 'visitas e articulação local', 'RJ'], ['monitoramento', 'movimento mais orgânico que digital', 'campo']],
+    rendimento: [['Melhor praça', 'interior próximo'], ['Regular', 'redes menores e base presencial'], ['Menor presença', 'capital']],
+    proximos: [['janela de 10 dias', 'circuito de visitas', 'interior', 'estimado'], ['janela de 15 dias', 'agenda com vereadores', 'RJ', 'estimado'], ['monitoramento', 'reação a concorrentes', 'campo', 'estimado']],
+    fontes: [['Perfil Instagram', 'https://www.instagram.com/jorginhobrum/']]
+  },
+  aureo_ribeiro: {
+    nome: 'Áureo Ribeiro',
+    partido: 'PL · RJ',
+    foto: 'candidatos/aureo_ribeiro_pl.png',
+    meta: ['6.9% intenção', 'Baixada e Niterói', 'mandato conhecido'],
+    acoes: [['semana atual', 'agenda legislativa e base do PL', 'RJ'], ['últimos dias', 'movimentos em redes com pautas nacionais', 'digital'], ['monitoramento', 'presença em eventos partidários', 'capital']],
+    rendimento: [['Melhor praça', 'Baixada / Niterói'], ['Boa leitura', 'base partidária'], ['Menor presença', 'Costa Verde']],
+    proximos: [['janela de 7 dias', 'encontros regionais', 'Baixada', 'estimado'], ['janela de 15 dias', 'ativação com base do PL', 'Niterói', 'estimado'], ['monitoramento', 'movimento digital', 'Instagram', 'estimado']],
+    fontes: [['Câmara dos Deputados', 'https://www.camara.leg.br/deputados/160664'], ['Instagram', 'https://www.instagram.com/deputadoaureo/']]
+  },
+  bebeto: {
+    nome: 'Bebeto',
+    partido: 'PSC · RJ',
+    foto: 'candidatos/bebeto_PSC.png',
+    meta: ['6.4% intenção', 'esporte e memória popular', 'reconhecimento transversal'],
+    acoes: [['últimos dias', 'mobilização por esporte e projetos sociais', 'capital / interior'], ['monitoramento', 'conteúdo de legado esportivo', 'digital'], ['semana atual', 'visitas de proximidade', 'RJ']],
+    rendimento: [['Melhor praça', 'capital popular e esporte'], ['Boa conexão', 'homens 35+'], ['Menor presença', 'agenda territorial Costa Verde']],
+    proximos: [['janela de 10 dias', 'agenda esportiva e social', 'RJ', 'estimado'], ['monitoramento', 'aparições públicas', 'digital', 'estimado'], ['janela de 20 dias', 'encontros comunitários', 'interior', 'estimado']],
+    fontes: [['Wikipedia', 'https://pt.wikipedia.org/wiki/Bebeto_(futebolista)'], ['Instagram', 'https://www.instagram.com/bebeto/']]
+  },
+  carlos_jordy: {
+    nome: 'Carlos Jordy',
+    partido: 'PL · RJ',
+    foto: 'candidatos/carlos_jordy_PL.png',
+    meta: ['6.0% intenção', 'Niterói / direita ideológica', 'digital forte'],
+    acoes: [['semana atual', 'vídeos de confronto político e segurança', 'digital'], ['últimos dias', 'agenda com militância de direita', 'Niterói'], ['monitoramento', 'presença forte em cortes e reels', 'Instagram / X']],
+    rendimento: [['Melhor praça', 'Niterói e bolha ideológica'], ['Força digital', 'reels e recortes'], ['Menor presença', 'bairro-a-bairro Costa Verde']],
+    proximos: [['janela de 7 dias', 'rodada de vídeos de ataque', 'digital', 'estimado'], ['janela de 15 dias', 'agenda em Niterói', 'Niterói', 'estimado'], ['monitoramento', 'debate e resposta a pautas federais', 'X', 'estimado']],
+    fontes: [['Instagram', 'https://www.instagram.com/carlosjordy/'], ['Câmara dos Deputados', 'https://www.camara.leg.br/deputados/204554']]
+  },
+  chico_alencar: {
+    nome: 'Chico Alencar',
+    partido: 'PSOL · RJ',
+    foto: 'candidatos/chico_alencar_PSOL.png',
+    meta: ['5.6% intenção', 'capital progressista', 'base orgânica'],
+    acoes: [['semana atual', 'agenda de plenário e movimentos sociais', 'capital'], ['últimos dias', 'intervenções públicas em educação e direitos', 'RJ'], ['monitoramento', 'boas menções em públicos de esquerda', 'digital']],
+    rendimento: [['Melhor praça', 'capital progressista'], ['Boa retenção', 'universitário e funcionalismo'], ['Menor presença', 'direita de interior']],
+    proximos: [['janela de 10 dias', 'atos e plenárias', 'capital', 'estimado'], ['janela de 15 dias', 'encontros setoriais', 'RJ', 'estimado'], ['monitoramento', 'conteúdo propositivo', 'Instagram', 'estimado']],
+    fontes: [['Instagram', 'https://www.instagram.com/chicoalencar/'], ['Wikipedia', 'https://pt.wikipedia.org/wiki/Chico_Alencar']]
+  },
+  chris_tonietto: {
+    nome: 'Chris Tonietto',
+    partido: 'PL · RJ',
+    foto: 'candidatos/chris_tonieto_PL.png',
+    meta: ['5.1% intenção', 'católico conservador', 'digital segmentado'],
+    acoes: [['semana atual', 'pautas de costumes e conservadorismo', 'digital'], ['últimos dias', 'presença em agendas de direita e igreja', 'capital'], ['monitoramento', 'conteúdo de alta identidade ideológica', 'Instagram']],
+    rendimento: [['Melhor praça', 'conservadorismo católico'], ['Boa conversão', 'base nichada'], ['Menor presença', 'território popular Costa Verde']],
+    proximos: [['janela de 7 dias', 'postagens de identidade ideológica', 'digital', 'estimado'], ['janela de 15 dias', 'agendas religiosas', 'capital', 'estimado'], ['monitoramento', 'alianças do PL', 'RJ', 'estimado']],
+    fontes: [['Instagram', 'https://www.instagram.com/christonietto/'], ['Câmara dos Deputados', 'https://www.camara.leg.br/deputados/204536']]
+  },
+  delegado_furtado: {
+    nome: 'Delegado Antônio Furtado',
+    partido: 'PL · RJ',
+    foto: 'candidatos/delegado_furtado_PL.png',
+    meta: ['4.8% intenção', 'segurança pública', 'muito interior'],
+    acoes: [['semana atual', 'agenda focada em segurança e polícia', 'interior'], ['últimos dias', 'visitas e encontros com bases locais', 'Sul Fluminense'], ['monitoramento', 'conteúdo de autoridade e ordem', 'digital']],
+    rendimento: [['Melhor praça', 'Sul Fluminense e interior'], ['Boa leitura', 'segurança pública'], ['Menor presença', 'capital e litoral']],
+    proximos: [['janela de 10 dias', 'rota por cidades do interior', 'Sul Fluminense', 'estimado'], ['janela de 15 dias', 'falas de segurança', 'digital', 'estimado'], ['monitoramento', 'aproximação com bases do PL', 'interior', 'estimado']],
+    fontes: [['Instagram', 'https://www.instagram.com/delegadofurtado/']]
+  }
+};
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const sec = document.getElementById('sec-' + id);
+  if (sec) sec.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if ((n.getAttribute('onclick') || '').includes("'" + id + "'")) n.classList.add('active');
+  });
+  if (pageTitles[id]) {
+    document.getElementById('pageTitle').textContent = pageTitles[id][0];
+    document.getElementById('pageSub').textContent   = pageTitles[id][1];
+  }
+  if (window.lucide) window.lucide.createIcons();
+  setTimeout(() => buildCharts(id), 80);
+}
+
+function setCandidateActiveCard(key) {
+  document.querySelectorAll('.cand-card').forEach(card => {
+    card.classList.toggle('active-detail', card.dataset.candidateKey === key);
+  });
+}
+
+function renderCandidateMeta(items) {
+  return items.map(item => `<span class="card-badge badge-cinza">${item}</span>`).join('');
+}
+
+function renderDetailRows(rows) {
+  return rows.map(([left, right, extra]) => `<div class="detail-row"><span>${left}</span><span style="text-align:right;color:var(--branco);font-weight:600;">${right}${extra ? `<div style="color:var(--texto-sec);font-weight:400;margin-top:2px;">${extra}</div>` : ''}</span></div>`).join('');
+}
+
+function showCandidateDetail(key) {
+  const data = candidateDetails[key];
+  if (!data) return;
+  document.getElementById('detailPhoto').src = data.foto;
+  document.getElementById('detailPhoto').alt = `Foto de ${data.nome}`;
+  document.getElementById('detailTitle').textContent = data.nome;
+  document.getElementById('detailSub').textContent = data.partido;
+  document.getElementById('detailMeta').innerHTML = renderCandidateMeta(data.meta);
+  document.getElementById('detailActions').innerHTML = renderDetailRows(data.acoes);
+  document.getElementById('detailPerformance').innerHTML = renderDetailRows(data.rendimento);
+  document.getElementById('detailNextMoves').innerHTML = data.proximos.map(([quando, acao, local, status]) => `<tr><td>${quando}</td><td>${acao}</td><td>${local}</td><td><span class="card-badge badge-est">${status}</span></td></tr>`).join('');
+  document.getElementById('detailSources').innerHTML = data.fontes.map(([label, url]) => `<div class="detail-row"><span>${label}</span><span><a class="link-button" href="${url}" target="_blank" rel="noopener"><i data-lucide="external-link"></i><span>Abrir</span></a></span></div>`).join('');
+  setCandidateActiveCard(key);
+  showSection('candidato-detalhe');
+}
+
+/* ── CLOCK ── */
+function updateClock() {
+  const el = document.getElementById('lastUpdate');
+  if (!el) return;
+  const now = new Date();
+  el.textContent = now.toLocaleDateString('pt-BR') + ' · ' + now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+}
+updateClock();
+setInterval(updateClock, 60000);
+
+/* ── CHARTS ── */
+const _charts = {};
+const GRID  = 'rgba(255,255,255,0.06)';
+const TICK  = '#8a8aaa';
+
+function mkChart(id, type, labels, datasets, extra) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (_charts[id]) _charts[id].destroy();
+  _charts[id] = new Chart(el, {
+    type,
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, ...(extra?.plugins || {}) },
+      scales: (type === 'pie' || type === 'doughnut') ? {} : {
+        x: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 } } },
+        y: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 } } },
+        ...(extra?.scales || {})
+      },
+      ...(extra || {})
+    }
+  });
+}
+
+function buildCharts(id) {
+  if (id === 'dashboard') {
+    mkChart('cEvolucao','line',
+      ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago'],
+      [{ label:'Intenção %', data:[4.1,4.8,5.5,6.2,6.8,7.4,8.1,8.7],
+         borderColor:'#22c55e', backgroundColor:'rgba(34,197,94,0.12)',
+         fill:true, tension:.4, borderWidth:2, pointBackgroundColor:'#22c55e', pointRadius:3 }]
+    );
+    mkChart('cFaixa','doughnut',
+      ['16–24','25–34','35–44','45–59','60+'],
+      [{ data:[12,18,24,22,14],
+         backgroundColor:['#3b82f6','#22c55e','#f59e0b','#8b5cf6','#6b7280'],
+         borderWidth:0 }]
+    );
+  }
+  if (id === 'pesquisas') {
+    mkChart('cInstitutos','bar',
+      ['Datafolha','IBOPE','Quaest','Atlas','Paraná'],
+      [{ label:'%', data:[9.1,12.8,7.6,8.9,14.2],
+         backgroundColor:['#22c55e','#3b82f6','#f59e0b','#8b5cf6','#22c55e'],
+         borderRadius:4 }]
+    );
+    mkChart('cHistPeq','line',
+      ['Jan','Fev','Mar','Abr','Mai'],
+      [
+        { label:'Datafolha', data:[5.8,6.4,7.2,8.1,9.1], borderColor:'#22c55e', tension:.4, borderWidth:2, pointRadius:3 },
+        { label:'IBOPE',     data:[8.2,9.1,10.4,11.8,12.8], borderColor:'#3b82f6', tension:.4, borderWidth:2, pointRadius:3 },
+        { label:'Quaest',    data:[4.8,5.5,6.1,7.0,7.6],  borderColor:'#f59e0b', tension:.4, borderWidth:2, pointRadius:3 }
+      ]
+    );
+  }
+  if (id === 'territorios') {
+    mkChart('cIdade','bar',
+      ['16–24','25–34','35–44','45–59','60+'],
+      [{ label:'Aprovação %', data:[58,63,71,68,44],
+         backgroundColor:['#3b82f6','#22c55e','#22c55e','#22c55e','#ef4444'],
+         borderRadius:4 }]
+    );
+    mkChart('cFlutuacao','line',
+      ['Sem 1','Sem 2','Sem 3','Sem 4'],
+      [
+        { label:'Angra',       data:[82,85,87,90], borderColor:'#22c55e', tension:.4, borderWidth:2 },
+        { label:'Paraty',      data:[58,60,61,62], borderColor:'#3b82f6', tension:.4, borderWidth:2 },
+        { label:'Mangaratiba', data:[45,47,46,48], borderColor:'#f59e0b', tension:.4, borderWidth:2 },
+        { label:'Itaguaí',     data:[40,38,37,38], borderColor:'#ef4444', tension:.4, borderWidth:2 }
+      ]
+    );
+  }
+  if (id === 'concorrentes') {
+    mkChart('cConcor','bar',
+      ['Angra','Paraty','R. Claro','Mangaratiba','Itaguaí'],
+      [
+        { label:'Renato', data:[88,62,55,48,38], backgroundColor:'rgba(34,197,94,0.8)', borderRadius:3 },
+        { label:'Chico',  data:[12,18,22,38,52], backgroundColor:'rgba(239,68,68,0.8)', borderRadius:3 }
+      ]
+    );
+  }
+  if (id === 'redes') {
+    mkChart('cRedes','line',
+      ['01/04','07/04','14/04','21/04','28/04','30/04'],
+      [
+        { label:'Instagram', data:[31200,31800,32000,32400,32600,32700], borderColor:'#e1306c', tension:.4, borderWidth:2 },
+        { label:'Facebook',  data:[46800,47100,47500,47900,48100,48300], borderColor:'#1877f2', tension:.4, borderWidth:2 },
+        { label:'Twitter/X', data:[17800,17900,18000,18050,18080,18100], borderColor:'#1da1f2', tension:.4, borderWidth:2 }
+      ]
+    );
+    mkChart('cSentimento','doughnut',
+      ['Positivo','Neutro','Negativo'],
+      [{ data:[78,14,8], backgroundColor:['#22c55e','#6b7280','#ef4444'], borderWidth:0 }]
+    );
+  }
+  if (id === 'diario') {
+    mkChart('cDiario','bar',
+      ['Seg','Ter','Qua','Qui','Sex','Sáb'],
+      [{ label:'Atividades', data:[8,12,9,14,11,6],
+         backgroundColor:'rgba(34,197,94,0.75)', borderRadius:4 }]
+    );
+  }
+  if (id === 'ia') {
+    mkChart('cProjecao','line',
+      ['Ago/26','Set/26','Out/26 (Eleição)'],
+      [
+        { label:'Otimista',   data:[72000,78000,88000], borderColor:'#22c55e', tension:.4, borderWidth:2 },
+        { label:'Base',       data:[68000,71000,72100], borderColor:'#3b82f6', tension:.4, borderWidth:2 },
+        { label:'Pessimista', data:[60000,62000,64000], borderColor:'#ef4444', tension:.4, borderWidth:2, borderDash:[5,3] }
+      ]
+    );
+  }
+  if (id === 'demandas') {
+    mkChart('cDemandas','bar',
+      ['Saúde','Segurança','Infraest.','Emprego','Educação','Turismo','Moradia'],
+      [{ label:'Menções', data:[482,341,298,261,198,176,91],
+         backgroundColor:['#22c55e','#3b82f6','#f59e0b','#8b5cf6','#22c55e','#60a5fa','#f472b6'],
+         borderRadius:4 }],
+      { indexAxis:'y' }
+    );
+  }
+  if (id === 'financeiro') {
+    mkChart('cBudget','doughnut',
+      ['TV/Rádio','Digital','Eventos','Material','Pessoal','Pesquisas','Outros'],
+      [{ data:[35,22,18,10,8,4,3],
+         backgroundColor:['#22c55e','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#60a5fa','#6b7280'],
+         borderWidth:0 }]
+    );
+    mkChart('cGastos','bar',
+      ['Jan','Fev','Mar','Abr','Mai (prev)','Jun (prev)'],
+      [{ label:'Gastos (R$ mil)', data:[120,185,210,265,310,250],
+         backgroundColor:'rgba(34,197,94,0.7)', borderRadius:4 }]
+    );
+  }
+}
+
+function reloadCharts() {
+  const active = document.querySelector('.section.active');
+  if (!active) return;
+  const id = active.id.replace('sec-','');
+  buildCharts(id);
+}
+
+/* ── INIT ── */
+if (window.lucide) window.lucide.createIcons();
+setTimeout(() => buildCharts('dashboard'), 200);
+</script>
+</body>
+</html>
