@@ -25,7 +25,130 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
   html, body { height: 100%; background: var(--cinza-bg); color: var(--branco); overflow: hidden; }
-  #app { display: flex; height: 100vh; }
+  #app { display: none; height: 100vh; }
+  #app.logado { display: flex; animation: fadeIn .4s ease; }
+
+  /* ══ LOGIN SCREEN ══ */
+  #login-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: radial-gradient(ellipse at 30% 40%, #0d1f10 0%, #0a0a10 60%, #050508 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+  #login-screen.fade-out { animation: loginFadeOut .5s ease forwards; }
+  @keyframes loginFadeOut { to { opacity:0; transform:scale(1.04); } }
+
+  .login-bg-deco {
+    position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  }
+  .login-bg-deco::before {
+    content:''; position:absolute; width:600px; height:600px; border-radius:50%;
+    background: radial-gradient(circle, rgba(27,138,62,0.08) 0%, transparent 70%);
+    top:-100px; left:-100px;
+  }
+  .login-bg-deco::after {
+    content:''; position:absolute; width:400px; height:400px; border-radius:50%;
+    background: radial-gradient(circle, rgba(26,79,160,0.07) 0%, transparent 70%);
+    bottom:-80px; right:-80px;
+  }
+
+  .login-card {
+    position: relative; z-index: 1;
+    background: rgba(22,22,29,0.95);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 40px 44px 36px;
+    width: 400px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(34,197,94,0.06) inset;
+    backdrop-filter: blur(16px);
+  }
+
+  .login-logo-wrap {
+    text-align: center; margin-bottom: 28px;
+  }
+  .login-logo-img {
+    max-width: 180px; height: auto; display: inline-block;
+    filter: brightness(1.05);
+  }
+  .login-title {
+    font-size: 13px; font-weight: 700; color: var(--branco);
+    text-transform: uppercase; letter-spacing: 1.5px;
+    text-align: center; margin-top: 10px;
+  }
+  .login-subtitle {
+    font-size: 11px; color: var(--texto-sec);
+    text-align: center; margin-top: 4px; letter-spacing: .3px;
+  }
+
+  .login-divider {
+    height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+    margin: 22px 0;
+  }
+
+  .login-field-wrap { margin-bottom: 14px; }
+  .login-field-label {
+    font-size: 10px; color: var(--texto-sec); text-transform: uppercase;
+    letter-spacing: .8px; margin-bottom: 6px; display: block;
+  }
+  .login-field {
+    width: 100%; box-sizing: border-box;
+    background: #0e0e15;
+    border: 1px solid var(--cinza-borda);
+    border-radius: 9px;
+    color: var(--branco);
+    font-size: 13px;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    font-family: inherit;
+  }
+  .login-field:focus {
+    border-color: rgba(34,197,94,0.5);
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.08);
+  }
+  .login-field.shake { animation: shake .4s ease; }
+  @keyframes shake {
+    0%,100%{ transform:translateX(0) }
+    20%{ transform:translateX(-6px) }
+    40%{ transform:translateX(6px) }
+    60%{ transform:translateX(-4px) }
+    80%{ transform:translateX(4px) }
+  }
+
+  .login-btn {
+    width: 100%; margin-top: 8px;
+    background: linear-gradient(135deg, #1B8A3E, #22c55e);
+    border: none; border-radius: 9px;
+    color: #fff; font-size: 13px; font-weight: 700;
+    letter-spacing: .5px; text-transform: uppercase;
+    padding: 13px; cursor: pointer;
+    transition: opacity .15s, transform .1s;
+    font-family: inherit;
+  }
+  .login-btn:hover { opacity: .92; }
+  .login-btn:active { transform: scale(.98); }
+  .login-btn:disabled { opacity:.5; cursor:not-allowed; }
+
+  .login-error {
+    display: none; margin-top: 12px;
+    background: rgba(239,68,68,0.12);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 8px; padding: 9px 12px;
+    font-size: 11px; color: #fca5a5; text-align: center;
+  }
+  .login-error.visible { display: block; animation: fadeIn .2s ease; }
+
+  .login-footer {
+    margin-top: 24px; text-align: center;
+    font-size: 10px; color: rgba(138,138,170,0.5);
+    letter-spacing: .3px;
+  }
+  .login-dot-live {
+    display: inline-block; width: 6px; height: 6px;
+    border-radius: 50%; background: #22c55e;
+    animation: pulse 2s infinite; margin-right: 4px;
+    vertical-align: middle;
+  }
 
   /* ── SIDEBAR ── */
   #sidebar { width: 210px; min-width: 210px; background: var(--cinza-painel); border-right: 1px solid var(--cinza-borda); display: flex; flex-direction: column; overflow-y: auto; }
@@ -234,6 +357,157 @@
   .prev-col { text-align: center; }
   .prev-col div:first-child { color: var(--texto-sec); margin-bottom: 2px; }
 
+  /* ══ NOVOS ESTILOS v3.0 ══ */
+
+  /* ── VERBA / BUDGET ── */
+  .budget-table { width:100%; border-collapse:collapse; font-size:11px; }
+  .budget-table th { color:var(--texto-sec); font-size:9px; text-transform:uppercase; letter-spacing:.5px; padding:5px 8px; border-bottom:1px solid var(--cinza-borda); text-align:left; }
+  .budget-table td { padding:8px 8px; border-bottom:1px solid #1e1e2822; vertical-align:middle; }
+  .budget-table tr:last-child td { border-bottom:none; }
+  .budget-table tr:hover td { background:rgba(42,42,56,.3); }
+  .exec-bar { display:flex; align-items:center; gap:6px; }
+  .exec-bar-bg { flex:1; height:7px; background:#2a2a38; border-radius:4px; overflow:hidden; min-width:60px; }
+  .exec-bar-fill { height:100%; border-radius:4px; }
+  .lancamento-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--cinza-borda); font-size:11px; }
+  .lancamento-row:last-child { border-bottom:none; }
+  .lancamento-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .lancamento-info { flex:1; }
+  .lancamento-desc { font-size:11px; font-weight:600; }
+  .lancamento-det { font-size:10px; color:var(--texto-sec); margin-top:1px; }
+  .lancamento-valor { font-size:13px; font-weight:700; }
+  .fonte-badge { display:inline-block; font-size:9px; padding:2px 7px; border-radius:10px; }
+  .fonte-fe { background:#0d2a1a; color:#4ade80; border:1px solid #22c55e44; }
+  .fonte-fp { background:#0d1a2a; color:#60a5fa; border:1px solid #3b82f644; }
+  .fonte-doa { background:#2a1a0d; color:#fb923c; border:1px solid #f59e0b44; }
+
+  /* ── MATERIAL ── */
+  .material-item { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--cinza-borda); }
+  .material-item:last-child { border-bottom:none; }
+  .material-icon { font-size:20px; width:36px; text-align:center; flex-shrink:0; }
+  .material-info { flex:1; }
+  .material-nome { font-size:12px; font-weight:600; }
+  .material-sub { font-size:10px; color:var(--texto-sec); }
+  .material-stock { text-align:right; }
+  .material-qtd { font-size:16px; font-weight:700; }
+  .material-unit { font-size:10px; color:var(--texto-sec); }
+  .pedido-row { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--cinza-borda); font-size:11px; }
+  .pedido-row:last-child { border-bottom:none; }
+  .badge-entregue { background:#0d2a1a; color:#4ade80; border:1px solid #22c55e33; }
+  .badge-producao { background:#1a1a0d; color:#fbbf24; border:1px solid #f59e0b33; }
+  .badge-aguardando { background:#0d1020; color:#93c5fd; border:1px solid #3b82f633; }
+  .dist-muni { display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--cinza-borda); font-size:11px; }
+  .dist-muni:last-child { border-bottom:none; }
+  .dist-muni-nome { min-width:110px; font-weight:600; }
+
+  /* ── CABOS ELEITORAIS ── */
+  .cabo-card { background:var(--cinza-card); border:1px solid var(--cinza-borda); border-radius:10px; padding:12px 14px; margin-bottom:10px; }
+  .cabo-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .cabo-avatar { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#0f172a; flex-shrink:0; }
+  .cabo-nome { font-size:13px; font-weight:700; }
+  .cabo-area { font-size:10px; color:var(--texto-sec); margin-top:1px; }
+  .cabo-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+  .cabo-stat { background:#13131c; border-radius:6px; padding:7px 8px; text-align:center; }
+  .cabo-stat-val { font-size:14px; font-weight:700; }
+  .cabo-stat-lbl { font-size:9px; color:var(--texto-sec); text-transform:uppercase; letter-spacing:.4px; margin-top:2px; }
+  .cabo-progress { margin-top:8px; }
+  .cabo-prog-bar { height:5px; background:#2a2a38; border-radius:3px; overflow:hidden; margin-top:4px; }
+  .cabo-prog-fill { height:100%; border-radius:3px; }
+
+  /* ── CRM ELEITORAL ── */
+  .funil-wrap { display:flex; gap:8px; align-items:flex-end; margin-bottom:8px; }
+  .funil-col { flex:1; text-align:center; }
+  .funil-bar-col { display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .funil-box { width:100%; border-radius:6px 6px 0 0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; transition:height .3s; }
+  .funil-lbl { font-size:9px; color:var(--texto-sec); text-transform:uppercase; letter-spacing:.4px; white-space:nowrap; }
+  .funil-val { font-size:16px; font-weight:800; margin-top:2px; }
+  .multiplicador-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--cinza-borda); }
+  .multiplicador-row:last-child { border-bottom:none; }
+  .mult-avatar { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#0f172a; flex-shrink:0; }
+  .mult-info { flex:1; }
+  .mult-nome { font-size:12px; font-weight:600; }
+  .mult-bairro { font-size:10px; color:var(--texto-sec); }
+  .mult-votos { text-align:right; }
+  .mult-qtd { font-size:15px; font-weight:700; color:#22c55e; }
+  .mult-tipo { font-size:9px; color:var(--texto-sec); }
+  .crm-meta-bar { height:16px; background:#2a2a38; border-radius:8px; overflow:hidden; margin:6px 0; }
+  .crm-meta-fill { height:100%; border-radius:8px; background:linear-gradient(90deg,#1a8a3e,#22c55e); display:flex; align-items:center; justify-content:flex-end; padding-right:8px; }
+
+  /* ── COMPLIANCE TSE ── */
+  .compliance-item { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--cinza-borda); }
+  .compliance-item:last-child { border-bottom:none; }
+  .comp-status-icon { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:13px; }
+  .comp-ok   { background:#0d2a1a; color:#22c55e; }
+  .comp-warn { background:#2a1a0d; color:#f59e0b; }
+  .comp-err  { background:#2a0d0d; color:#ef4444; }
+  .comp-info { flex:1; }
+  .comp-titulo { font-size:12px; font-weight:600; }
+  .comp-detalhe { font-size:10px; color:var(--texto-sec); margin-top:2px; }
+  .comp-prazo { text-align:right; white-space:nowrap; }
+  .comp-data { font-size:11px; font-weight:600; }
+  .comp-dias { font-size:10px; margin-top:1px; }
+  .prazo-timeline { margin:8px 0; }
+  .prazo-item { display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-left:2px solid var(--cinza-borda); padding-left:16px; position:relative; }
+  .prazo-item::before { content:''; width:10px; height:10px; border-radius:50%; background:var(--cinza-borda); position:absolute; left:-6px; top:14px; }
+  .prazo-item.urgente::before  { background:#ef4444; box-shadow:0 0 6px #ef444466; }
+  .prazo-item.proximo::before  { background:#f59e0b; }
+  .prazo-item.ok::before       { background:#22c55e; }
+  .prazo-data-col { min-width:75px; }
+  .prazo-data-txt { font-size:12px; font-weight:700; }
+  .prazo-dias-txt { font-size:10px; color:var(--texto-sec); }
+  .prazo-desc { font-size:11px; line-height:1.5; }
+  .prazo-orgao { font-size:10px; color:var(--texto-sec); margin-top:2px; }
+
+  /* ── COMUNICAÇÃO ── */
+  .wpp-grupo-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--cinza-borda); }
+  .wpp-grupo-row:last-child { border-bottom:none; }
+  .wpp-icon { width:38px; height:38px; border-radius:10px; background:#0a3320; border:1px solid #22c55e33; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+  .wpp-nome { font-size:12px; font-weight:600; }
+  .wpp-det { font-size:10px; color:var(--texto-sec); }
+  .wpp-membros { text-align:right; }
+  .wpp-qtd { font-size:14px; font-weight:700; color:#22c55e; }
+  .wpp-last { font-size:10px; color:var(--texto-sec); }
+  .template-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--cinza-borda); font-size:11px; }
+  .template-row:last-child { border-bottom:none; }
+  .template-badge { font-size:9px; padding:2px 8px; border-radius:10px; white-space:nowrap; }
+  .badge-wpp { background:#0a3320; color:#4ade80; border:1px solid #22c55e33; }
+  .badge-inst { background:#2a1030; color:#e879f9; border:1px solid #a855f733; }
+  .badge-tikt { background:#101a2a; color:#60a5fa; border:1px solid #3b82f633; }
+  .badge-email { background:#1a1a0a; color:#fbbf24; border:1px solid #f59e0b33; }
+  .cal-editorial { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+  .cal-dia { background:#16161d; border:1px solid var(--cinza-borda); border-radius:6px; padding:6px 5px; min-height:70px; }
+  .cal-dia-label { font-size:9px; color:var(--texto-sec); text-align:center; margin-bottom:4px; text-transform:uppercase; }
+  .cal-dia-num { font-size:11px; font-weight:700; text-align:center; margin-bottom:4px; }
+  .cal-post { font-size:8.5px; padding:2px 4px; border-radius:3px; margin-bottom:2px; line-height:1.3; }
+  .cal-post-wpp { background:#0a2a18; color:#4ade80; }
+  .cal-post-inst { background:#1a0a2a; color:#e879f9; }
+  .cal-post-tikt { background:#0a1020; color:#60a5fa; }
+  .cal-post-ev { background:#1a0a0a; color:#fb923c; }
+
+  /* ── CALCULADORA ELEITORAL ── */
+  .calc-section { background:var(--cinza-card); border:1px solid var(--cinza-borda); border-radius:10px; padding:16px; margin-bottom:14px; }
+  .calc-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--branco); margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--cinza-borda); }
+  .calc-row { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+  .calc-label { font-size:11px; color:var(--texto-sec); min-width:200px; }
+  .calc-input { background:#13131c; border:1px solid var(--cinza-borda); color:var(--branco); font-size:13px; font-weight:600; padding:7px 12px; border-radius:7px; width:140px; text-align:right; }
+  .calc-input:focus { outline:none; border-color:#22c55e66; }
+  .calc-result-box { background:#0d2a1a; border:1px solid #22c55e44; border-radius:10px; padding:14px 16px; text-align:center; }
+  .calc-result-label { font-size:10px; color:#86efac; text-transform:uppercase; letter-spacing:.6px; margin-bottom:4px; }
+  .calc-result-value { font-size:32px; font-weight:800; color:#22c55e; line-height:1; }
+  .calc-result-sub { font-size:11px; color:#86efac; margin-top:4px; }
+  .calc-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; }
+  .cenario-box { border-radius:8px; padding:12px; text-align:center; }
+  .cenario-otimista   { background:#0d2a1a; border:1px solid #22c55e44; }
+  .cenario-base       { background:#0d1a2a; border:1px solid #3b82f644; }
+  .cenario-pessimista { background:#2a0d0d; border:1px solid #ef444444; }
+  .cenario-label { font-size:10px; text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+  .cenario-votos { font-size:24px; font-weight:800; line-height:1; }
+  .cenario-prob { font-size:11px; margin-top:4px; }
+  .zona-table { width:100%; border-collapse:collapse; font-size:11px; }
+  .zona-table th { color:var(--texto-sec); font-size:9px; text-transform:uppercase; letter-spacing:.4px; padding:5px 8px; border-bottom:1px solid var(--cinza-borda); }
+  .zona-table td { padding:8px 8px; border-bottom:1px solid #1e1e2820; text-align:center; }
+  .zona-table td:first-child { text-align:left; }
+  .zona-table tr:last-child td { border-bottom:none; }
+
   /* ── RESPONSIVO BÁSICO ── */
   @media (max-width: 900px) {
     #sidebar { width: 52px; min-width: 52px; }
@@ -245,6 +519,50 @@
 </style>
 </head>
 <body>
+<!-- ══════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-bg-deco"></div>
+  <div class="login-card">
+
+    <div class="login-logo-wrap">
+      <img class="login-logo-img" src="renatobrancofundoecuro.png" alt="Renato Araújo">
+      <div class="login-title">Cockpit de Campanha</div>
+      <div class="login-subtitle">Deputado Federal · Rio de Janeiro · 2026</div>
+    </div>
+
+    <div class="login-divider"></div>
+
+    <div class="login-field-wrap">
+      <label class="login-field-label" for="inp_login">Usuário</label>
+      <input class="login-field" id="inp_login" type="text"
+             placeholder="nome de usuário" autocomplete="username"
+             onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-field-wrap">
+      <label class="login-field-label" for="inp_senha">Senha</label>
+      <input class="login-field" id="inp_senha" type="password"
+             placeholder="••••••••••" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+
+    <button class="login-btn" id="login-btn" onclick="doLogin()">
+      Entrar no Cockpit
+    </button>
+
+    <div class="login-error" id="login-error">
+      Usuário ou senha incorretos. Tente novamente.
+    </div>
+
+    <div class="login-footer">
+      <span class="login-dot-live"></span>
+      Sistema seguro &nbsp;·&nbsp; Acesso restrito à equipe de campanha
+    </div>
+
+  </div>
+</div>
+
 <div id="app">
 
   <!-- ══ SIDEBAR ══ -->
@@ -256,7 +574,7 @@
       <div class="logo-photo-frame">
         <img class="logo-photo" src="candidatos/c8.png" alt="Foto principal de Renato Araújo">
       </div>
-      <div class="versao">Cockpit v2.0 · 2026</div>
+      <div class="versao">Cockpit v3.0 · 2026</div>
     </div>
 
     <div class="nav-section">
@@ -277,12 +595,24 @@
       <div class="nav-label">Inteligência</div>
       <div class="nav-item" onclick="showSection('ia')"><span class="nav-icon"><i data-lucide="brain-circuit"></i></span><span>IA Preditiva</span></div>
       <div class="nav-item" onclick="showSection('demandas')"><span class="nav-icon"><i data-lucide="messages-square"></i></span><span>Demandas Pop.</span></div>
-      <div class="nav-item" onclick="showSection('financeiro')"><span class="nav-icon"><i data-lucide="wallet"></i></span><span>Financeiro</span></div>
     </div>
     <div class="nav-section">
       <div class="nav-label">Campo</div>
       <div class="nav-item" onclick="showSection('candidatos')"><span class="nav-icon"><i data-lucide="user-round-search"></i></span><span>Candidatos</span></div>
       <div class="nav-item" onclick="showSection('eventos')"><span class="nav-icon"><i data-lucide="calendar-days"></i></span><span>Agenda</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Operacional</div>
+      <div class="nav-item" onclick="showSection('cabos')"><span class="nav-icon"><i data-lucide="network"></i></span><span>Rede de Cabos</span></div>
+      <div class="nav-item" onclick="showSection('crm')"><span class="nav-icon"><i data-lucide="vote"></i></span><span>CRM Eleitoral</span></div>
+      <div class="nav-item" onclick="showSection('material')"><span class="nav-icon"><i data-lucide="package-2"></i></span><span>Material Camp.</span></div>
+      <div class="nav-item" onclick="showSection('comunicacao')"><span class="nav-icon"><i data-lucide="message-circle"></i></span><span>Comunicação</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Gestão &amp; Jurídico</div>
+      <div class="nav-item" onclick="showSection('financeiro')"><span class="nav-icon"><i data-lucide="wallet"></i></span><span>Gestão de Verba</span></div>
+      <div class="nav-item" onclick="showSection('compliance')"><span class="nav-icon"><i data-lucide="shield-check"></i></span><span>Compliance TSE</span></div>
+      <div class="nav-item" onclick="showSection('calculadora')"><span class="nav-icon"><i data-lucide="calculator"></i></span><span>Calculadora</span></div>
     </div>
 
     <div class="sidebar-footer">
@@ -413,6 +743,37 @@
             </tbody>
           </table>
           <div class="small-note">Convenção: REAL = fonte pública confirmada; ESTIMADO = cálculo ou leitura interna do cockpit; PENDENTE = precisa de coleta manual/API autorizada.</div>
+        </div>
+
+        <!-- Countdown + Saúde Operacional da Campanha -->
+        <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:10px;margin-bottom:14px;align-items:stretch;">
+          <div class="card" style="text-align:center;min-width:130px;display:flex;flex-direction:column;justify-content:center;align-items:center;background:linear-gradient(135deg,#0d1a2a,#0d2a1a);border-color:#22c55e33;">
+            <div style="font-size:9px;color:#86efac;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">⏱ Dias para Eleição</div>
+            <div id="countdown_dias" style="font-size:52px;font-weight:900;color:#22c55e;line-height:1;">157</div>
+            <div style="font-size:10px;color:#86efac;margin-top:4px;">4 de Outubro · 2026</div>
+          </div>
+          <div class="card" style="background:#0d2a1a;border-color:#22c55e33;">
+            <div style="font-size:9px;color:#86efac;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">🗳️ Meta de Votos — Progresso</div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;"><span style="color:var(--texto-sec);">Confirmados</span><span style="color:#22c55e;font-weight:700;">18.420 / 45.000</span></div>
+            <div class="crm-meta-bar"><div class="crm-meta-fill" style="width:41%"><span style="font-size:9px;color:#fff;font-weight:700;">41%</span></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin:8px 0 5px;"><span style="color:var(--texto-sec);">Comprometidos</span><span style="color:#60a5fa;font-weight:700;">28.400 / 45.000</span></div>
+            <div style="height:8px;background:#2a2a38;border-radius:4px;overflow:hidden;"><div style="width:63%;height:100%;background:linear-gradient(90deg,#1d4ed8,#3b82f6);border-radius:4px;"></div></div>
+            <div style="margin-top:8px;font-size:10px;color:var(--texto-sec);">Faltam <b style="color:#f59e0b;">16.600 votos</b> para bater a meta com segurança</div>
+          </div>
+          <div class="card" style="background:#13131c;">
+            <div style="font-size:9px;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">📊 Saúde da Campanha</div>
+            <div class="prog-row" style="margin-bottom:6px;"><div class="prog-label" style="min-width:110px;">Verba executada</div><div class="prog-bar"><div class="prog-fill" style="width:41%;background:#f59e0b;"></div></div><div class="prog-val warn">41%</div></div>
+            <div class="prog-row" style="margin-bottom:6px;"><div class="prog-label" style="min-width:110px;">Cabos ativos</div><div class="prog-bar"><div class="prog-fill" style="width:71%;background:#22c55e;"></div></div><div class="prog-val up">71%</div></div>
+            <div class="prog-row" style="margin-bottom:6px;"><div class="prog-label" style="min-width:110px;">Bairros cobertos</div><div class="prog-bar"><div class="prog-fill" style="width:79%;background:#3b82f6;"></div></div><div class="prog-val" style="color:#60a5fa;">79%</div></div>
+            <div class="prog-row" style="margin-bottom:6px;"><div class="prog-label" style="min-width:110px;">Material distribuído</div><div class="prog-bar"><div class="prog-fill" style="width:32%;background:#f59e0b;"></div></div><div class="prog-val warn">32%</div></div>
+            <div class="prog-row"><div class="prog-label" style="min-width:110px;">Compliance TSE</div><div class="prog-bar"><div class="prog-fill" style="width:92%;background:#22c55e;"></div></div><div class="prog-val up">92%</div></div>
+          </div>
+          <div class="card" style="background:#13131c;">
+            <div style="font-size:9px;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">🚨 Ações Urgentes</div>
+            <div class="ai-item" style="margin-bottom:6px;"><div class="ai-icon"><i data-lucide="alert-octagon" style="color:#ef4444;"></i></div><div class="ai-text"><b>Itaguaí:</b> apenas 23% da meta. Alocar 10 cabos urgente.<span class="ai-tag" style="background:#2a0d0d;color:#fca5a5;border:1px solid #ef444433;">Crítico</span></div></div>
+            <div class="ai-item" style="margin-bottom:6px;"><div class="ai-icon"><i data-lucide="triangle-alert" style="color:#f59e0b;"></i></div><div class="ai-text"><b>Compliance:</b> 1 doação acima do limite PF. Devolver R$ 2.800.<span class="ai-tag" style="background:#2a1a0d;color:#fbbf24;border:1px solid #f59e0b33;">Atenção</span></div></div>
+            <div class="ai-item"><div class="ai-icon"><i data-lucide="package" style="color:#f59e0b;"></i></div><div class="ai-text"><b>Material:</b> Itaguaí com 29% distribuído. Rota de entrega urgente.<span class="ai-tag" style="background:#2a1a0d;color:#fbbf24;border:1px solid #f59e0b33;">Atenção</span></div></div>
+          </div>
         </div>
 
         <div class="grid2">
@@ -807,23 +1168,772 @@
         </div>
       </div>
 
-      <!-- ══ FINANCEIRO ══ -->
+      <!-- ══ FINANCEIRO (v3 — Gestão de Verba Completa) ══ -->
       <div id="sec-financeiro" class="section">
         <div class="kpi-row">
-          <div class="kpi-card"><div class="kpi-label">Budget total</div><div class="kpi-value" style="color:#22c55e;">R$ 2.8M</div><div class="kpi-sub" style="color:var(--texto-sec);">limite FUNDO ELEITORAL</div></div>
-          <div class="kpi-card"><div class="kpi-label">Gasto até hoje</div><div class="kpi-value" style="color:#f59e0b;">R$ 1.14M</div><div class="kpi-sub warn">41% do budget</div></div>
-          <div class="kpi-card"><div class="kpi-label">Previsão de gasto</div><div class="kpi-value" style="color:#60a5fa;">R$ 2.4M</div><div class="kpi-sub" style="color:var(--texto-sec);">85% do total</div></div>
-          <div class="kpi-card"><div class="kpi-label">ROI / voto estimado</div><div class="kpi-value" style="color:#22c55e;">R$ 16,70</div><div class="kpi-sub up">▲ eficiência ok</div></div>
+          <div class="kpi-card">
+            <div class="kpi-label">Fundo Eleitoral Recebido</div>
+            <div class="kpi-value" style="color:#22c55e;">R$ 2,80M</div>
+            <div class="kpi-sub" style="color:var(--texto-sec);">limite legal TSE 2026</div>
+            <div class="kpi-bar"><div class="kpi-fill" style="width:100%;background:#22c55e;"></div></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Gasto Acumulado</div>
+            <div class="kpi-value" style="color:#f59e0b;">R$ 1,14M</div>
+            <div class="kpi-sub warn">41% do budget · dia 45/135</div>
+            <div class="kpi-bar"><div class="kpi-fill" style="width:41%;background:#f59e0b;"></div></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Ritmo Diário de Gasto</div>
+            <div class="kpi-value" style="color:#60a5fa;">R$ 25,3K</div>
+            <div class="kpi-sub warn">projeção final: R$ 2,68M</div>
+            <div class="kpi-bar"><div class="kpi-fill" style="width:67%;background:#3b82f6;"></div></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Custo por Voto (estimado)</div>
+            <div class="kpi-value" style="color:#22c55e;">R$ 15,80</div>
+            <div class="kpi-sub up">▲ eficiência excelente</div>
+            <div class="kpi-bar"><div class="kpi-fill" style="width:78%;background:#22c55e;"></div></div>
+          </div>
         </div>
-        <div class="grid2">
+
+        <div class="grid-7-5 mb14">
           <div class="card">
-            <div class="card-header"><div class="card-title">Distribuição do Budget</div><span class="card-badge badge-azul">por categoria</span></div>
-            <div class="chart-wrap" style="height:220px;"><canvas id="cBudget"></canvas></div>
+            <div class="card-header"><div class="card-title">Execução Orçamentária — Semana a Semana</div><span class="card-badge badge-verde">planejado vs. realizado</span></div>
+            <div class="chart-wrap" style="height:200px;"><canvas id="cExecucao"></canvas></div>
           </div>
           <div class="card">
-            <div class="card-header"><div class="card-title">Fluxo de Gastos Mensais</div><span class="card-badge badge-verde">evolução</span></div>
-            <div class="chart-wrap" style="height:220px;"><canvas id="cGastos"></canvas></div>
+            <div class="card-header"><div class="card-title">Origem dos Recursos</div><span class="card-badge badge-azul">fontes</span></div>
+            <div class="chart-wrap" style="height:200px;"><canvas id="cFontes"></canvas></div>
+            <div style="margin-top:10px;display:flex;flex-direction:column;gap:4px;">
+              <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid var(--cinza-borda);">
+                <span><span class="fonte-badge fonte-fe">Fundo Eleitoral</span></span><span style="font-weight:700;color:#22c55e;">R$ 2.240.000</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid var(--cinza-borda);">
+                <span><span class="fonte-badge fonte-fp">Fundo Partidário</span></span><span style="font-weight:700;color:#60a5fa;">R$ 420.000</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;">
+                <span><span class="fonte-badge fonte-doa">Doações PF (limite R$ 1.064/doador)</span></span><span style="font-weight:700;color:#fb923c;">R$ 140.000</span>
+              </div>
+            </div>
           </div>
+        </div>
+
+        <div class="grid2 mb14">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Execução por Rubrica</div><span class="card-badge badge-amarelo">orçado vs. realizado</span></div>
+            <table class="budget-table">
+              <thead><tr><th>Rubrica</th><th>Orçado</th><th>Realizado</th><th>% Exec.</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>Propaganda Eleitoral (TV/Rádio)</td><td>R$ 980K</td><td>R$ 398K</td><td><div class="exec-bar"><div class="exec-bar-bg"><div class="exec-bar-fill" style="width:41%;background:#3b82f6;"></div></div><span style="font-size:10px;min-width:28px;">41%</span></div></td><td><span class="card-badge badge-verde">Em dia</span></td></tr>
+                <tr><td>Mídias Digitais (Meta/Google/TikTok)</td><td>R$ 616K</td><td>R$ 312K</td><td><div class="exec-bar"><div class="exec-bar-bg"><div class="exec-bar-fill" style="width:51%;background:#22c55e;"></div></div><span style="font-size:10px;min-width:28px;">51%</span></div></td><td><span class="card-badge badge-verde">Em dia</span></td></tr>
+                <tr><td>Eventos / Comícios / Showmícios</td><td>R$ 504K</td><td>R$ 168K</td><td><div class="exec-bar"><div class="exec-bar-bg"><div class="exec-bar-fill" style="width:33%;background:#f59e0b;"></div></div><span style="font-size:10px;min-width:28px;">33%</span></div></td><td><span class="card-badge badge-amarelo">Atrasado</span></td></tr>
+                <tr><td>Material Gráfico (Santinhos/Banners)</td><td>R$ 280K</td><td>R$ 148K</td><td><div class="exec-bar"><div class="exec-bar-bg"><div class="exec-bar-fill" style="width:53%;background:#22c55e;"></div></div><span style="font-size:10px;min-width:28px;">53%</span></div></td><td><span class="card-badge badge-verde">Em dia</span></td></tr>
+                <tr><td>Pesquisas Eleitorais</td><td>R$ 112K</td><td>R$ 96K</td><td><div class="exec-bar"><div class="exec-bar-bg"><div class="exec-bar-fill" style="width:86%;background:#ef4444;"></div></div><span style="font-size:10px;min-width:28px;">86%</span></div></td><td><span class="card-badge badge-vermelho">Quase esgotado</span></td></tr>
+                <tr><td>Equipe / Assessoria / Consultoria</td><td>R$ 168K</td><td>R$ 126K</td><td><div class="exec-bar"><div class="exec-bar-bg"><div class="exec-bar-fill" style="width:75%;background:#f59e0b;"></div></div><span style="font-size:10px;min-width:28px;">75%</span></div></td><td><span class="card-badge badge-amarelo">Atenção</span></td></tr>
+                <tr><td>Combustível / Logística / Aluguel</td><td>R$ 140K</td><td>R$ 92K</td><td><div class="exec-bar"><div class="exec-bar-bg"><div class="exec-bar-fill" style="width:66%;background:#8b5cf6;"></div></div><span style="font-size:10px;min-width:28px;">66%</span></div></td><td><span class="card-badge badge-azul">Normal</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Últimos Lançamentos</div><span class="card-badge badge-real">extrato</span></div>
+            <div class="lancamento-row">
+              <div class="lancamento-icon" style="background:#0d1a2a;color:#60a5fa;"><i data-lucide="tv-2" style="width:16px;height:16px;"></i></div>
+              <div class="lancamento-info"><div class="lancamento-desc">Inserção Rádio Angra 99FM — Maio/26</div><div class="lancamento-det">28 abr 2026 · Publicidade · NFS 4.892</div></div>
+              <div class="lancamento-valor" style="color:#ef4444;">-R$ 38.400</div>
+            </div>
+            <div class="lancamento-row">
+              <div class="lancamento-icon" style="background:#0a2a10;color:#22c55e;"><i data-lucide="smartphone" style="width:16px;height:16px;"></i></div>
+              <div class="lancamento-info"><div class="lancamento-desc">Meta Ads — Boost campanha semana 18</div><div class="lancamento-det">27 abr 2026 · Mídias Digitais · Invoice 2026-04</div></div>
+              <div class="lancamento-valor" style="color:#ef4444;">-R$ 22.600</div>
+            </div>
+            <div class="lancamento-row">
+              <div class="lancamento-icon" style="background:#2a2a0a;color:#fbbf24;"><i data-lucide="printer" style="width:16px;height:16px;"></i></div>
+              <div class="lancamento-info"><div class="lancamento-desc">Gráfica Imagem Ltda — Santinhos 2ª tiragem</div><div class="lancamento-det">25 abr 2026 · Material Gráfico · NFS 7.114</div></div>
+              <div class="lancamento-valor" style="color:#ef4444;">-R$ 41.800</div>
+            </div>
+            <div class="lancamento-row">
+              <div class="lancamento-icon" style="background:#0d2a1a;color:#4ade80;"><i data-lucide="trending-up" style="width:16px;height:16px;"></i></div>
+              <div class="lancamento-info"><div class="lancamento-desc">Repasse Fundo Eleitoral — TRE-RJ Parcela 3</div><div class="lancamento-det">20 abr 2026 · Fundo Eleitoral · Transferência</div></div>
+              <div class="lancamento-valor" style="color:#22c55e;">+R$ 560.000</div>
+            </div>
+            <div class="lancamento-row">
+              <div class="lancamento-icon" style="background:#1a0a30;color:#c084fc;"><i data-lucide="mic-2" style="width:16px;height:16px;"></i></div>
+              <div class="lancamento-info"><div class="lancamento-desc">Produtora Vídeo Político — Spot 30s</div><div class="lancamento-det">18 abr 2026 · Prod. Audiovisual · NFS 0381</div></div>
+              <div class="lancamento-valor" style="color:#ef4444;">-R$ 28.000</div>
+            </div>
+            <div class="lancamento-row">
+              <div class="lancamento-icon" style="background:#1a1a0a;color:#fbbf24;"><i data-lucide="users" style="width:16px;height:16px;"></i></div>
+              <div class="lancamento-info"><div class="lancamento-desc">Comício Angra dos Reis — estrutura/som/luz</div><div class="lancamento-det">15 abr 2026 · Eventos · NFS 2.990</div></div>
+              <div class="lancamento-valor" style="color:#ef4444;">-R$ 64.000</div>
+            </div>
+            <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--cinza-borda);">
+              <div class="alert-box alert-grn" style="font-size:10px;">✓ Conformidade com Lei nº 9.504/97 e Resolução TSE 23.607/2019. Prestação parcial enviada em 15/04/2026. Próximo envio: 31/07/2026.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Alertas Financeiros &amp; Compliance de Verba</div><span class="card-badge badge-amarelo">atenção necessária</span></div>
+          <div class="grid3">
+            <div class="alert-box alert-grn">✓ <b>Fundo Eleitoral dentro do limite.</b> Repasse de R$ 2,24M dentro do teto máximo legal para Deputado Federal.</div>
+            <div class="alert-box" style="background:#2a1a0d;border:1px solid #f59e0b33;color:#fbbf24;">⚠ <b>Pesquisas Eleitorais a 86%.</b> Rubrica quase esgotada. Solicitar suplementação ou reduzir frequência de pesquisas.</div>
+            <div class="alert-box" style="background:#0d1a2a;border:1px solid #3b82f633;color:#93c5fd;">ℹ <b>Eventos 33% executados.</b> Alto volume de comícios previstos para Jul-Set. Ritmo de gastos precisa acelerar nessa rubrica.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MATERIAL DE CAMPANHA ══ -->
+      <div id="sec-material" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Itens em Estoque</div><div class="kpi-value" style="color:#22c55e;">682K</div><div class="kpi-sub up">peças disponíveis</div></div>
+          <div class="kpi-card"><div class="kpi-label">Distribuído este mês</div><div class="kpi-value" style="color:#60a5fa;">218K</div><div class="kpi-sub" style="color:var(--texto-sec);">32% do total produzido</div></div>
+          <div class="kpi-card"><div class="kpi-label">Pedidos em Produção</div><div class="kpi-value" style="color:#f59e0b;">4</div><div class="kpi-sub warn">3 gráficas ativas</div></div>
+          <div class="kpi-card"><div class="kpi-label">Municípios Abastecidos</div><div class="kpi-value" style="color:#22c55e;">4/4</div><div class="kpi-sub up">cobertura 100%</div></div>
+        </div>
+        <div class="grid2 mb14">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Estoque de Material</div><span class="card-badge badge-verde">inventário atual</span></div>
+            <div class="material-item">
+              <div class="material-icon">🗳️</div>
+              <div class="material-info"><div class="material-nome">Santinhos 14x10cm</div><div class="material-sub">2ª tiragem — frente/verso · papel couchê 90g</div></div>
+              <div class="material-stock"><div class="material-qtd" style="color:#22c55e;">312.400</div><div class="material-unit">unidades</div></div>
+            </div>
+            <div class="material-item">
+              <div class="material-icon">📋</div>
+              <div class="material-info"><div class="material-nome">Folders A5 (programa de governo)</div><div class="material-sub">frente/verso · 4 cores · dobra ao meio</div></div>
+              <div class="material-stock"><div class="material-qtd" style="color:#22c55e;">48.200</div><div class="material-unit">unidades</div></div>
+            </div>
+            <div class="material-item">
+              <div class="material-icon">🚩</div>
+              <div class="material-info"><div class="material-nome">Banners 1,2×1,8m</div><div class="material-sub">lona 440g · ilhoses · impressão digital</div></div>
+              <div class="material-stock"><div class="material-qtd" style="color:#f59e0b;">840</div><div class="material-unit">unidades</div></div>
+            </div>
+            <div class="material-item">
+              <div class="material-icon">📌</div>
+              <div class="material-info"><div class="material-nome">Adesivos redondos 5cm</div><div class="material-sub">vinil adesivo · resistente à chuva</div></div>
+              <div class="material-stock"><div class="material-qtd" style="color:#22c55e;">210.000</div><div class="material-unit">unidades</div></div>
+            </div>
+            <div class="material-item">
+              <div class="material-icon">👕</div>
+              <div class="material-info"><div class="material-nome">Camisetas (P/M/G/GG)</div><div class="material-sub">100% algodão · verde/branco · serigrafia</div></div>
+              <div class="material-stock"><div class="material-qtd" style="color:#f59e0b;">2.860</div><div class="material-unit">unidades</div></div>
+            </div>
+            <div class="material-item">
+              <div class="material-icon">🧢</div>
+              <div class="material-info"><div class="material-nome">Bonés bordados</div><div class="material-sub">aba curva · bordado digital · 6 cores</div></div>
+              <div class="material-stock"><div class="material-qtd" style="color:#ef4444;">380</div><div class="material-unit">unidades</div></div>
+            </div>
+            <div class="material-item">
+              <div class="material-icon">📢</div>
+              <div class="material-info"><div class="material-nome">Placas de rua 30×40cm</div><div class="material-sub">PVC 3mm · UV · hastes inclusas</div></div>
+              <div class="material-stock"><div class="material-qtd" style="color:#ef4444;">1.240</div><div class="material-unit">unidades</div></div>
+            </div>
+            <div class="material-item">
+              <div class="material-icon">🎪</div>
+              <div class="material-info"><div class="material-nome">Tendas 3×3m (aluguel)</div><div class="material-sub">estrutura+tela+logo · semanas de evento</div></div>
+              <div class="material-stock"><div class="material-qtd" style="color:#22c55e;">8</div><div class="material-unit">unidades</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Pedidos em Produção</div><span class="card-badge badge-amarelo">status gráficas</span></div>
+            <div class="pedido-row">
+              <div style="flex:1;"><div style="font-size:12px;font-weight:700;">Santinhos 3ª Tiragem — 400K un.</div><div style="font-size:10px;color:var(--texto-sec);">Gráfica Bairral · Angra dos Reis · NF 9.241</div></div>
+              <div style="text-align:right;"><span class="card-badge badge-producao">Em Produção</span><div style="font-size:10px;color:var(--texto-sec);margin-top:3px;">Entrega: 12 Mai</div></div>
+            </div>
+            <div class="pedido-row">
+              <div style="flex:1;"><div style="font-size:12px;font-weight:700;">Bonés bordados — 1.200 un.</div><div style="font-size:10px;color:var(--texto-sec);">Uniformes RJ · Niterói · NF 1.882</div></div>
+              <div style="text-align:right;"><span class="card-badge badge-producao">Em Produção</span><div style="font-size:10px;color:var(--texto-sec);margin-top:3px;">Entrega: 20 Mai</div></div>
+            </div>
+            <div class="pedido-row">
+              <div style="flex:1;"><div style="font-size:12px;font-weight:700;">Placas de rua — 2.000 un.</div><div style="font-size:10px;color:var(--texto-sec);">Lettering Express · RJ · NF 4.410</div></div>
+              <div style="text-align:right;"><span class="card-badge badge-aguardando">Aguardando Aprovação</span><div style="font-size:10px;color:var(--texto-sec);margin-top:3px;">Prazo: 8 Mai</div></div>
+            </div>
+            <div class="pedido-row">
+              <div style="flex:1;"><div style="font-size:12px;font-weight:700;">Camisetas G/GG — 800 un.</div><div style="font-size:10px;color:var(--texto-sec);">PrintCamp · Itaguaí · NF a emitir</div></div>
+              <div style="text-align:right;"><span class="card-badge badge-entregue">Entregue ✓</span><div style="font-size:10px;color:var(--texto-sec);margin-top:3px;">29 Abr 2026</div></div>
+            </div>
+            <div style="margin-top:16px;">
+              <div class="card-header" style="margin-bottom:10px;"><div class="card-title">Distribuição por Município</div></div>
+              <div class="dist-muni">
+                <div class="dist-muni-nome">Angra dos Reis</div>
+                <div class="mini-bar-wrap" style="flex:1;"><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:72%;background:#22c55e;"></div></div><span class="mini-val up">72%</span></div>
+                <span style="font-size:10px;color:var(--texto-sec);min-width:70px;text-align:right;">154K peças</span>
+              </div>
+              <div class="dist-muni">
+                <div class="dist-muni-nome">Paraty</div>
+                <div class="mini-bar-wrap" style="flex:1;"><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:48%;background:#3b82f6;"></div></div><span class="mini-val" style="color:#60a5fa;">48%</span></div>
+                <span style="font-size:10px;color:var(--texto-sec);min-width:70px;text-align:right;">38K peças</span>
+              </div>
+              <div class="dist-muni">
+                <div class="dist-muni-nome">Mangaratiba</div>
+                <div class="mini-bar-wrap" style="flex:1;"><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:38%;background:#f59e0b;"></div></div><span class="mini-val warn">38%</span></div>
+                <span style="font-size:10px;color:var(--texto-sec);min-width:70px;text-align:right;">16K peças</span>
+              </div>
+              <div class="dist-muni">
+                <div class="dist-muni-nome">Itaguaí</div>
+                <div class="mini-bar-wrap" style="flex:1;"><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:29%;background:#ef4444;"></div></div><span class="mini-val down">29%</span></div>
+                <span style="font-size:10px;color:var(--texto-sec);min-width:70px;text-align:right;">10K peças</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Análise de Cobertura e Alertas de Material</div><span class="card-badge badge-amarelo">ação necessária</span></div>
+          <div class="grid3">
+            <div class="alert-box alert-grn">✓ <b>Santinhos abastecidos.</b> 3ª tiragem em produção. Cobertura de 4,1 santinhos por eleitor nos 4 municípios da Costa Verde.</div>
+            <div class="alert-box" style="background:#2a0d0d;border:1px solid #ef444433;color:#fca5a5;">✗ <b>Bonés e Placas de rua críticos.</b> Estoque de bonés a apenas 380 unidades. Itaguaí recebeu apenas 29% do material — priorizar entrega.</div>
+            <div class="alert-box" style="background:#2a1a0d;border:1px solid #f59e0b33;color:#fbbf24;">⚠ <b>Distribuição desequilibrada.</b> Angra dos Reis muito bem abastecida (72%), mas Itaguaí e Mangaratiba precisam de ação urgente de distribuição.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ REDE DE CABOS ELEITORAIS ══ -->
+      <div id="sec-cabos" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Cabos Eleitorais Ativos</div><div class="kpi-value" style="color:#22c55e;">284</div><div class="kpi-sub up">▲ 38 novos este mês</div></div>
+          <div class="kpi-card"><div class="kpi-label">Votos Comprometidos</div><div class="kpi-value" style="color:#60a5fa;">28.400</div><div class="kpi-sub" style="color:var(--texto-sec);">63% da meta de 45K</div></div>
+          <div class="kpi-card"><div class="kpi-label">Coordenadores Gerais</div><div class="kpi-value" style="color:#f59e0b;">18</div><div class="kpi-sub warn">2 posições em aberto</div></div>
+          <div class="kpi-card"><div class="kpi-label">Bairros com Cobertura</div><div class="kpi-value" style="color:#22c55e;">62/78</div><div class="kpi-sub up">79% dos bairros cobertos</div></div>
+        </div>
+
+        <div class="card mb14">
+          <div class="card-header"><div class="card-title">Coordenadores por Município</div><span class="card-badge badge-verde">líderes da rede de campo</span></div>
+
+          <div class="cabo-card">
+            <div class="cabo-header">
+              <div class="cabo-avatar" style="background:linear-gradient(135deg,#22c55e,#16a34a);">MO</div>
+              <div style="flex:1;">
+                <div class="cabo-nome">Marcos Oliveira</div>
+                <div class="cabo-area">Coord. Geral · Angra dos Reis · Centro/Zona Sul</div>
+              </div>
+              <span class="card-badge badge-verde">Angra dos Reis</span>
+            </div>
+            <div class="cabo-stats">
+              <div class="cabo-stat"><div class="cabo-stat-val" style="color:#22c55e;">84</div><div class="cabo-stat-lbl">cabos liderados</div></div>
+              <div class="cabo-stat"><div class="cabo-stat-val" style="color:#60a5fa;">12.200</div><div class="cabo-stat-lbl">votos meta</div></div>
+              <div class="cabo-stat"><div class="cabo-stat-val" style="color:#22c55e;">9.840</div><div class="cabo-stat-lbl">comprometidos</div></div>
+              <div class="cabo-stat"><div class="cabo-stat-val" style="color:#f59e0b;">81%</div><div class="cabo-stat-lbl">cobertura</div></div>
+            </div>
+            <div class="cabo-progress">
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--texto-sec);margin-bottom:3px;"><span>Meta de votos: Angra dos Reis</span><span>9.840 / 12.200</span></div>
+              <div class="cabo-prog-bar"><div class="cabo-prog-fill" style="width:81%;background:#22c55e;"></div></div>
+            </div>
+          </div>
+
+          <div class="cabo-card">
+            <div class="cabo-header">
+              <div class="cabo-avatar" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);">FS</div>
+              <div style="flex:1;">
+                <div class="cabo-nome">Fernanda Santos</div>
+                <div class="cabo-area">Coord. Geral · Angra dos Reis · Japuíba/Parque Mambucaba</div>
+              </div>
+              <span class="card-badge badge-azul">Angra dos Reis</span>
+            </div>
+            <div class="cabo-stats">
+              <div class="cabo-stat"><div class="cabo-stat-val" style="color:#22c55e;">62</div><div class="cabo-stat-lbl">cabos liderados</div></div>
+              <div class="cabo-stat"><div class="cabo-stat-val" style="color:#60a5fa;">8.800</div><div class="cabo-stat-lbl">votos meta</div></div>
+              <div class="cabo-stat"><div class="cabo-stat-val" style="color:#22c55e;">7.040</div><div class="cabo-stat-lbl">comprometidos</div></div>
+              <div class="cabo-stat"><div class="cabo-stat-val" style="color:#22c55e;">80%</div><div class="cabo-stat-lbl">cobertura</div></div>
+            </div>
+            <div class="cabo-progress">
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--texto-sec);margin-bottom:3px;"><span>Meta de votos: Japuíba/Mambucaba</span><span>7.040 / 8.800</span></div>
+              <div class="cabo-prog-bar"><div class="cabo-prog-fill" style="width:80%;background:#3b82f6;"></div></div>
+            </div>
+          </div>
+
+          <div class="cabo-card">
+            <div class="cabo-header">
+              <div class="cabo-avatar" style="background:linear-gradient(135deg,#f59e0b,#d97706);">RL</div>
+              <div style="flex:1;">
+                <div class="cabo-nome">Roberto Lima</div>
+                <div class="cabo-area">Coord. Geral · Paraty · Centro Histórico / costeira</div>
+              </div>
+              <span class="card-badge badge-amarelo">Paraty</span>
+            </div>
+            <div class="cabo-stats">
+              <div class="cabo-stat"><div class="cabo-stat-val" style="color:#22c55e;">48</div><div class="cabo-stat-lbl">cabos liderados</div></div>
+              <div class="cabo-stat"><div class="cabo-stat-val" style="color:#60a5fa;">6.500</div><div class="cabo-stat-lbl">votos meta</div></div>
+              <div class="cabo-stat"><div class="cabo-stat-val" style="color:#f59e0b;">3.900</div><div class="cabo-stat-lbl">comprometidos</div></div>
+              <div class="cabo-stat"><div class="cabo-stat-val" style="color:#f59e0b;">60%</div><div class="cabo-stat-lbl">cobertura</div></div>
+            </div>
+            <div class="cabo-progress">
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--texto-sec);margin-bottom:3px;"><span>Meta de votos: Paraty</span><span>3.900 / 6.500</span></div>
+              <div class="cabo-prog-bar"><div class="cabo-prog-fill" style="width:60%;background:#f59e0b;"></div></div>
+            </div>
+          </div>
+
+          <div class="cabo-card">
+            <div class="cabo-header">
+              <div class="cabo-avatar" style="background:linear-gradient(135deg,#ef4444,#b91c1c);">JM</div>
+              <div style="flex:1;">
+                <div class="cabo-nome">João Meira</div>
+                <div class="cabo-area">Coord. Geral · Itaguaí / Mangaratiba — precisam atenção</div>
+              </div>
+              <span class="card-badge badge-vermelho">Itaguaí + Mangaratiba</span>
+            </div>
+            <div class="cabo-stats">
+              <div class="cabo-stat"><div class="cabo-stat-val" style="color:#22c55e;">40</div><div class="cabo-stat-lbl">cabos liderados</div></div>
+              <div class="cabo-stat"><div class="cabo-stat-val" style="color:#60a5fa;">7.200</div><div class="cabo-stat-lbl">votos meta</div></div>
+              <div class="cabo-stat"><div class="cabo-stat-val" style="color:#ef4444;">4.320</div><div class="cabo-stat-lbl">comprometidos</div></div>
+              <div class="cabo-stat"><div class="cabo-stat-val" style="color:#ef4444;">60%</div><div class="cabo-stat-lbl">cobertura</div></div>
+            </div>
+            <div class="cabo-progress">
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--texto-sec);margin-bottom:3px;"><span>Meta de votos: Itaguaí + Mangaratiba</span><span>4.320 / 7.200</span></div>
+              <div class="cabo-prog-bar"><div class="cabo-prog-fill" style="width:60%;background:#ef4444;"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Cobertura de Bairros por Zona</div><span class="card-badge badge-azul">mapa de presença</span></div>
+          <div class="bairro-grid">
+            <div class="bairro-item"><div class="bairro-nome">Centro — Angra</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:94%;background:#22c55e;"></div></div><div class="bairro-pct up">94%</div></div></div>
+            <div class="bairro-item"><div class="bairro-nome">Japuíba</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:88%;background:#22c55e;"></div></div><div class="bairro-pct up">88%</div></div></div>
+            <div class="bairro-item"><div class="bairro-nome">Parque Mambucaba</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:82%;background:#22c55e;"></div></div><div class="bairro-pct up">82%</div></div></div>
+            <div class="bairro-item"><div class="bairro-nome">Vila Histórica</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:78%;background:#3b82f6;"></div></div><div class="bairro-pct" style="color:#60a5fa;">78%</div></div></div>
+            <div class="bairro-item"><div class="bairro-nome">Paraty — Centro</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:72%;background:#3b82f6;"></div></div><div class="bairro-pct" style="color:#60a5fa;">72%</div></div></div>
+            <div class="bairro-item"><div class="bairro-nome">Paraty — Zona Rural</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:44%;background:#f59e0b;"></div></div><div class="bairro-pct warn">44%</div></div></div>
+            <div class="bairro-item"><div class="bairro-nome">Mangaratiba — Centro</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:58%;background:#f59e0b;"></div></div><div class="bairro-pct warn">58%</div></div></div>
+            <div class="bairro-item"><div class="bairro-nome">Itacuruçá</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:41%;background:#f59e0b;"></div></div><div class="bairro-pct warn">41%</div></div></div>
+            <div class="bairro-item"><div class="bairro-nome">Itaguaí — Centro</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:62%;background:#f59e0b;"></div></div><div class="bairro-pct warn">62%</div></div></div>
+            <div class="bairro-item"><div class="bairro-nome">Itaguaí — Porto</div><div class="bairro-bar-wrap"><div class="bairro-bar"><div class="bairro-fill" style="width:34%;background:#ef4444;"></div></div><div class="bairro-pct down">34%</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ CRM ELEITORAL ══ -->
+      <div id="sec-crm" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Meta de Votos (2026)</div><div class="kpi-value" style="color:#22c55e;">45.000</div><div class="kpi-sub" style="color:var(--texto-sec);">coeficiente + margem 15%</div></div>
+          <div class="kpi-card"><div class="kpi-label">Votos Confirmados (firmes)</div><div class="kpi-value" style="color:#22c55e;">18.420</div><div class="kpi-sub up">41% da meta</div></div>
+          <div class="kpi-card"><div class="kpi-label">Votos Comprometidos</div><div class="kpi-value" style="color:#60a5fa;">28.400</div><div class="kpi-sub" style="color:var(--texto-sec);">63% da meta · estimado</div></div>
+          <div class="kpi-card"><div class="kpi-label">Multiplicadores Ativos</div><div class="kpi-value" style="color:#f59e0b;">1.284</div><div class="kpi-sub warn">média 22 votos/multiplicador</div></div>
+        </div>
+
+        <div class="grid-7-5 mb14">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Pipeline Eleitoral — Funil de Conversão</div><span class="card-badge badge-verde">banco de votos</span></div>
+            <div class="funil-wrap" style="height:160px;align-items:flex-end;padding:0 8px;">
+              <div class="funil-col">
+                <div class="funil-bar-col">
+                  <div class="funil-box" style="width:100%;height:140px;background:rgba(59,130,246,0.4);border:1px solid #3b82f644;">Contactados</div>
+                </div>
+                <div class="funil-lbl" style="margin-top:6px;">Contactados</div>
+                <div class="funil-val" style="color:#60a5fa;">142.600</div>
+              </div>
+              <div class="funil-col">
+                <div class="funil-bar-col">
+                  <div class="funil-box" style="width:100%;height:100px;background:rgba(249,115,22,0.4);border:1px solid #f97316aa;">Simpatizantes</div>
+                </div>
+                <div class="funil-lbl" style="margin-top:6px;">Simpatizantes</div>
+                <div class="funil-val" style="color:#fb923c;">68.400</div>
+              </div>
+              <div class="funil-col">
+                <div class="funil-bar-col">
+                  <div class="funil-box" style="width:100%;height:70px;background:rgba(234,179,8,0.4);border:1px solid #eab30844;">Comprometidos</div>
+                </div>
+                <div class="funil-lbl" style="margin-top:6px;">Comprometidos</div>
+                <div class="funil-val" style="color:#fbbf24;">28.400</div>
+              </div>
+              <div class="funil-col">
+                <div class="funil-bar-col">
+                  <div class="funil-box" style="width:100%;height:46px;background:rgba(34,197,94,0.5);border:1px solid #22c55e66;">Confirmados</div>
+                </div>
+                <div class="funil-lbl" style="margin-top:6px;">Confirmados</div>
+                <div class="funil-val" style="color:#22c55e;">18.420</div>
+              </div>
+              <div class="funil-col">
+                <div class="funil-bar-col">
+                  <div class="funil-box" style="width:100%;height:28px;background:rgba(139,92,246,0.5);border:1px solid #8b5cf666;">Multiplicadores</div>
+                </div>
+                <div class="funil-lbl" style="margin-top:6px;">Multiplicadores</div>
+                <div class="funil-val" style="color:#c084fc;">1.284</div>
+              </div>
+            </div>
+            <div style="margin-top:18px;">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--texto-sec);margin-bottom:6px;"><span>Progresso até a meta (45.000 votos)</span><span>28.400 / 45.000 — <b style="color:#22c55e;">63%</b></span></div>
+              <div class="crm-meta-bar"><div class="crm-meta-fill" style="width:63%;"><span style="font-size:9px;font-weight:700;color:#fff;">63%</span></div></div>
+            </div>
+            <div style="margin-top:12px;">
+              <div class="chart-wrap" style="height:160px;"><canvas id="cCrmMunicipio"></canvas></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Top Multiplicadores</div><span class="card-badge badge-roxo">maior impacto</span></div>
+            <div class="multiplicador-row">
+              <div class="mult-avatar" style="background:linear-gradient(135deg,#22c55e,#16a34a);">PS</div>
+              <div class="mult-info"><div class="mult-nome">Pastor Severino Cruz</div><div class="mult-bairro">Japuíba · Igreja Redenção · 1.240 fiéis</div></div>
+              <div class="mult-votos"><div class="mult-qtd">840</div><div class="mult-tipo">votos mobilizados</div></div>
+            </div>
+            <div class="multiplicador-row">
+              <div class="mult-avatar" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);">VA</div>
+              <div class="mult-info"><div class="mult-nome">Vereador Agnaldo Mota</div><div class="mult-bairro">Centro/Angra · mandato ativo · aliado PL</div></div>
+              <div class="mult-votos"><div class="mult-qtd">680</div><div class="mult-tipo">votos mobilizados</div></div>
+            </div>
+            <div class="multiplicador-row">
+              <div class="mult-avatar" style="background:linear-gradient(135deg,#f59e0b,#d97706);">LA</div>
+              <div class="mult-info"><div class="mult-nome">Luciana Alves (influencer)</div><div class="mult-bairro">@luciana_angra · 48K seguidores · Costa Verde</div></div>
+              <div class="mult-votos"><div class="mult-qtd">520</div><div class="mult-tipo">votos mobilizados</div></div>
+            </div>
+            <div class="multiplicador-row">
+              <div class="mult-avatar" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);">DC</div>
+              <div class="mult-info"><div class="mult-nome">Dir. Comercial Renato C.</div><div class="mult-bairro">Porto de Itaguaí · 400 funcionários</div></div>
+              <div class="mult-votos"><div class="mult-qtd">410</div><div class="mult-tipo">votos mobilizados</div></div>
+            </div>
+            <div class="multiplicador-row">
+              <div class="mult-avatar" style="background:linear-gradient(135deg,#ef4444,#b91c1c);">PB</div>
+              <div class="mult-info"><div class="mult-nome">Pres. Assoc. Bairro Paraty</div><div class="mult-bairro">Paraty Centro · liderança comunitária</div></div>
+              <div class="mult-votos"><div class="mult-qtd">280</div><div class="mult-tipo">votos mobilizados</div></div>
+            </div>
+            <div class="multiplicador-row">
+              <div class="mult-avatar" style="background:linear-gradient(135deg,#10b981,#059669);">EC</div>
+              <div class="mult-info"><div class="mult-nome">Empresário Eduardo Cruz</div><div class="mult-bairro">Mangaratiba · turismo náutico · 200 funcionários</div></div>
+              <div class="mult-votos"><div class="mult-qtd">220</div><div class="mult-tipo">votos mobilizados</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Votos por Município — Comprometidos vs. Meta</div><span class="card-badge badge-azul">acompanhamento territorial</span></div>
+          <table class="tbl">
+            <thead><tr><th>Município</th><th>Eleitorado Total</th><th>Meta de Votos</th><th>Comprometidos</th><th>Confirmados</th><th>% Meta</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><b>Angra dos Reis</b></td>
+                <td>98.400</td>
+                <td>21.000</td>
+                <td style="color:#60a5fa;font-weight:600;">17.100</td>
+                <td style="color:#22c55e;font-weight:600;">10.280</td>
+                <td><div class="mini-bar-wrap"><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:81%;background:#22c55e;"></div></div><span class="mini-val up">81%</span></div></td>
+                <td><span class="card-badge badge-verde">No caminho</span></td>
+              </tr>
+              <tr>
+                <td><b>Paraty</b></td>
+                <td>41.200</td>
+                <td>10.500</td>
+                <td style="color:#f59e0b;font-weight:600;">6.300</td>
+                <td style="color:#22c55e;font-weight:600;">4.140</td>
+                <td><div class="mini-bar-wrap"><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:60%;background:#f59e0b;"></div></div><span class="mini-val warn">60%</span></div></td>
+                <td><span class="card-badge badge-amarelo">Atenção</span></td>
+              </tr>
+              <tr>
+                <td><b>Mangaratiba</b></td>
+                <td>28.800</td>
+                <td>6.800</td>
+                <td style="color:#f59e0b;font-weight:600;">3.700</td>
+                <td style="color:#22c55e;font-weight:600;">2.480</td>
+                <td><div class="mini-bar-wrap"><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:54%;background:#f59e0b;"></div></div><span class="mini-val warn">54%</span></div></td>
+                <td><span class="card-badge badge-amarelo">Atenção</span></td>
+              </tr>
+              <tr>
+                <td><b>Itaguaí</b></td>
+                <td>112.600</td>
+                <td>6.700</td>
+                <td style="color:#ef4444;font-weight:600;">1.300</td>
+                <td style="color:#ef4444;font-weight:600;">1.520</td>
+                <td><div class="mini-bar-wrap"><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:23%;background:#ef4444;"></div></div><span class="mini-val down">23%</span></div></td>
+                <td><span class="card-badge badge-vermelho">Crítico</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="small-note" style="margin-top:8px;">⚠ Itaguaí é o ponto crítico: eleitorado grande (112K), mas penetração muito baixa (23%). Investimento urgente em cabos eleitorais e presença física.</div>
+        </div>
+      </div>
+
+      <!-- ══ COMPLIANCE TSE ══ -->
+      <div id="sec-compliance" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Score de Conformidade</div><div class="kpi-value" style="color:#22c55e;">92/100</div><div class="kpi-sub up">status: REGULAR</div></div>
+          <div class="kpi-card"><div class="kpi-label">Documentos em Dia</div><div class="kpi-value" style="color:#22c55e;">18</div><div class="kpi-sub up">✓ 18 de 21 itens ok</div></div>
+          <div class="kpi-card"><div class="kpi-label">Pendências Abertas</div><div class="kpi-value" style="color:#f59e0b;">3</div><div class="kpi-sub warn">2 urgentes · 1 próximo</div></div>
+          <div class="kpi-card"><div class="kpi-label">Próximo Prazo Legal</div><div class="kpi-value" style="color:#ef4444;">31 Jul</div><div class="kpi-sub down">Prestação parcial 2</div></div>
+        </div>
+
+        <div class="grid2 mb14">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Checklist de Conformidade TSE</div><span class="card-badge badge-verde">Lei 9.504/97 + Res. 23.607</span></div>
+            <div class="compliance-item">
+              <div class="comp-status-icon comp-ok">✓</div>
+              <div class="comp-info"><div class="comp-titulo">Registro de Candidatura (DRAP)</div><div class="comp-detalhe">Deferido pelo TRE-RJ em 28/03/2026 · Processo 0001243-88.2026</div></div>
+              <div class="comp-prazo"><div class="comp-data" style="color:#22c55e;">Deferido</div></div>
+            </div>
+            <div class="compliance-item">
+              <div class="comp-status-icon comp-ok">✓</div>
+              <div class="comp-info"><div class="comp-titulo">Conta Bancária Eleitoral</div><div class="comp-detalhe">Banco do Brasil · Ag. 3241-8 · CC 12.840-2 · CNPJ campanha ativo</div></div>
+              <div class="comp-prazo"><div class="comp-data" style="color:#22c55e;">Ativa</div></div>
+            </div>
+            <div class="compliance-item">
+              <div class="comp-status-icon comp-ok">✓</div>
+              <div class="comp-info"><div class="comp-titulo">Prestação de Contas Parcial 1</div><div class="comp-detalhe">Enviada via SPCE em 15/04/2026 · Sem impugnações · R$ 614K declarados</div></div>
+              <div class="comp-prazo"><div class="comp-data" style="color:#22c55e;">Enviada</div><div class="comp-dias" style="color:#22c55e;">Aprovada</div></div>
+            </div>
+            <div class="compliance-item">
+              <div class="comp-status-icon comp-ok">✓</div>
+              <div class="comp-info"><div class="comp-titulo">CNPJ da Campanha (regularidade RF)</div><div class="comp-detalhe">CNPJ 48.821.992/0001-84 · Situação ativa · Declarações em dia</div></div>
+              <div class="comp-prazo"><div class="comp-data" style="color:#22c55e;">Regular</div></div>
+            </div>
+            <div class="compliance-item">
+              <div class="comp-status-icon comp-warn">⚠</div>
+              <div class="comp-info"><div class="comp-titulo">Notas Fiscais — Gráficas (pendente)</div><div class="comp-detalhe">3 NFS pendentes de envio ao contador: Bairral, Lettering, PrintCamp</div></div>
+              <div class="comp-prazo"><div class="comp-data warn">Pendente</div><div class="comp-dias warn">! urgente</div></div>
+            </div>
+            <div class="compliance-item">
+              <div class="comp-status-icon comp-warn">⚠</div>
+              <div class="comp-info"><div class="comp-titulo">Contratos de Serviço — Consultoras</div><div class="comp-detalhe">2 contratos sem assinatura digital · exigência TSE para prestação final</div></div>
+              <div class="comp-prazo"><div class="comp-data warn">Pendente</div><div class="comp-dias warn">! urgente</div></div>
+            </div>
+            <div class="compliance-item">
+              <div class="comp-status-icon comp-ok">✓</div>
+              <div class="comp-info"><div class="comp-titulo">Proibição de Doações PJ</div><div class="comp-detalhe">Zero doações de pessoas jurídicas registradas · conforme Lei 13.488/2017</div></div>
+              <div class="comp-prazo"><div class="comp-data" style="color:#22c55e;">Regular</div></div>
+            </div>
+            <div class="compliance-item">
+              <div class="comp-status-icon comp-err">✗</div>
+              <div class="comp-info"><div class="comp-titulo">Limite por Doador PF (R$ 1.064/pessoa)</div><div class="comp-detalhe">1 doação acima do limite identificada · R$ 2.800 de Carlos M. · devolução pendente</div></div>
+              <div class="comp-prazo"><div class="comp-data down">Irregular</div><div class="comp-dias down">devolver!</div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">Timeline de Prazos Legais 2026</div><span class="card-badge badge-amarelo">calendário eleitoral TSE</span></div>
+            <div class="prazo-timeline">
+              <div class="prazo-item ok">
+                <div class="prazo-data-col"><div class="prazo-data-txt">15 Abr</div><div class="prazo-dias-txt" style="color:#22c55e;">✓ feito</div></div>
+                <div><div class="prazo-desc">Prestação de Contas Parcial 1</div><div class="prazo-orgao">TRE-RJ via SPCE · R$ 614K declarados</div></div>
+              </div>
+              <div class="prazo-item proximo">
+                <div class="prazo-data-col"><div class="prazo-data-txt">31 Jul</div><div class="prazo-dias-txt warn">93 dias</div></div>
+                <div><div class="prazo-desc">Prestação de Contas Parcial 2</div><div class="prazo-orgao">Obrigatório · SPCE · Resolução TSE 23.607/2019</div></div>
+              </div>
+              <div class="prazo-item proximo">
+                <div class="prazo-data-col"><div class="prazo-data-txt">5 Ago</div><div class="prazo-dias-txt warn">98 dias</div></div>
+                <div><div class="prazo-desc">Início da Propaganda Eleitoral</div><div class="prazo-orgao">Pode realizar eventos, materiais, anúncios pagos</div></div>
+              </div>
+              <div class="prazo-item urgente">
+                <div class="prazo-data-col"><div class="prazo-data-txt">4 Out</div><div class="prazo-dias-txt down">157 dias</div></div>
+                <div><div class="prazo-desc">🗳️ ELEIÇÃO — 1º Turno</div><div class="prazo-orgao">Deputado Federal · Rio de Janeiro · 46 vagas</div></div>
+              </div>
+              <div class="prazo-item proximo">
+                <div class="prazo-data-col"><div class="prazo-data-txt">31 Out</div><div class="prazo-dias-txt">184 dias</div></div>
+                <div><div class="prazo-desc">Prestação de Contas Final</div><div class="prazo-orgao">Prazo: 30 dias após o pleito · SPCE obrigatório</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ CENTRAL DE COMUNICAÇÃO ══ -->
+      <div id="sec-comunicacao" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Grupos de WhatsApp</div><div class="kpi-value" style="color:#22c55e;">42</div><div class="kpi-sub up">8.640 membros ativos</div></div>
+          <div class="kpi-card"><div class="kpi-label">Disparos esta semana</div><div class="kpi-value" style="color:#60a5fa;">18</div><div class="kpi-sub" style="color:var(--texto-sec);">avg. 420 membros/msg</div></div>
+          <div class="kpi-card"><div class="kpi-label">Taxa de Engajamento</div><div class="kpi-value" style="color:#22c55e;">68%</div><div class="kpi-sub up">▲ média nacional: 42%</div></div>
+          <div class="kpi-card"><div class="kpi-label">Conteúdos Programados</div><div class="kpi-value" style="color:#f59e0b;">31</div><div class="kpi-sub warn">próxima semana</div></div>
+        </div>
+
+        <div class="grid2 mb14">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Grupos de WhatsApp — Rede Ativa</div><span class="card-badge badge-verde">comunicação de base</span></div>
+            <div class="wpp-grupo-row">
+              <div class="wpp-icon">💬</div>
+              <div style="flex:1;"><div class="wpp-nome">Coordenadores Gerais — Costa Verde</div><div class="wpp-det">Apenas coords. · secreto · alta confiança</div></div>
+              <div class="wpp-membros"><div class="wpp-qtd">18</div><div class="wpp-last">msg: há 2h</div></div>
+            </div>
+            <div class="wpp-grupo-row">
+              <div class="wpp-icon">💬</div>
+              <div style="flex:1;"><div class="wpp-nome">Cabos — Angra dos Reis Norte</div><div class="wpp-det">Cabos eleitorais · Japuíba · Mambucaba</div></div>
+              <div class="wpp-membros"><div class="wpp-qtd">146</div><div class="wpp-last">msg: há 1h</div></div>
+            </div>
+            <div class="wpp-grupo-row">
+              <div class="wpp-icon">💬</div>
+              <div style="flex:1;"><div class="wpp-nome">Cabos — Angra dos Reis Sul</div><div class="wpp-det">Cabos eleitorais · Centro/Praia Grande</div></div>
+              <div class="wpp-membros"><div class="wpp-qtd">138</div><div class="wpp-last">msg: há 3h</div></div>
+            </div>
+            <div class="wpp-grupo-row">
+              <div class="wpp-icon">💬</div>
+              <div style="flex:1;"><div class="wpp-nome">Apoiadores — Paraty</div><div class="wpp-det">Base aberta · simpatizantes · Paraty</div></div>
+              <div class="wpp-membros"><div class="wpp-qtd">612</div><div class="wpp-last">msg: hoje</div></div>
+            </div>
+            <div class="wpp-grupo-row">
+              <div class="wpp-icon">💬</div>
+              <div style="flex:1;"><div class="wpp-nome">Turismo & Preservação — Costa Verde</div><div class="wpp-det">Nicho turismo · lideranças · Angra/Paraty</div></div>
+              <div class="wpp-membros"><div class="wpp-qtd">284</div><div class="wpp-last">msg: ontem</div></div>
+            </div>
+            <div class="wpp-grupo-row">
+              <div class="wpp-icon">💬</div>
+              <div style="flex:1;"><div class="wpp-nome">Trabalhadores Porto — Itaguaí</div><div class="wpp-det">Nicho emprego/porto · Itaguaí</div></div>
+              <div class="wpp-membros"><div class="wpp-qtd">320</div><div class="wpp-last">msg: há 6h</div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">Templates de Mensagem — Biblioteca</div><span class="card-badge badge-azul">mensagens pré-aprovadas</span></div>
+            <div class="template-row">
+              <span class="template-badge badge-wpp">WhatsApp</span>
+              <div style="flex:1;"><b>Convite para Comício</b> — "Vem aí o grande evento..."</div>
+              <span style="font-size:10px;color:#22c55e;">8.2K enviados</span>
+            </div>
+            <div class="template-row">
+              <span class="template-badge badge-inst">Instagram</span>
+              <div style="flex:1;"><b>Post de Proposta</b> — "Nossa visão para a Costa Verde..."</div>
+              <span style="font-size:10px;color:#22c55e;">42K alcance médio</span>
+            </div>
+            <div class="template-row">
+              <span class="template-badge badge-wpp">WhatsApp</span>
+              <div style="flex:1;"><b>Lembrete de Votação</b> — "No dia 4 de outubro..."</div>
+              <span style="font-size:10px;color:var(--texto-sec);">programado Set</span>
+            </div>
+            <div class="template-row">
+              <span class="template-badge badge-tikt">TikTok</span>
+              <div style="flex:1;"><b>Vídeo viral — "Você sabia que..."</b></div>
+              <span style="font-size:10px;color:#22c55e;">180K views médio</span>
+            </div>
+            <div class="template-row">
+              <span class="template-badge badge-wpp">WhatsApp</span>
+              <div style="flex:1;"><b>Agradecimento de Base</b> — "Obrigado pela confiança..."</div>
+              <span style="font-size:10px;color:var(--texto-sec);">post-eleição</span>
+            </div>
+            <div class="template-row">
+              <span class="template-badge badge-email">E-mail</span>
+              <div style="flex:1;"><b>Newsletter semanal — Renato em Ação</b></div>
+              <span style="font-size:10px;color:#22c55e;">2.840 inscritos</span>
+            </div>
+            <div style="margin-top:12px;">
+              <div class="chart-wrap" style="height:140px;"><canvas id="cEngajamento"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Calendário Editorial — Semana 19 (Próxima)</div><span class="card-badge badge-amarelo">planejamento de conteúdo</span></div>
+          <div class="cal-editorial">
+            <div class="cal-dia"><div class="cal-dia-label">Seg</div><div class="cal-dia-num">5 Mai</div><div class="cal-post cal-post-inst">📸 Proposta Saúde</div><div class="cal-post cal-post-wpp">💬 Disparo Coordenadores</div></div>
+            <div class="cal-dia"><div class="cal-dia-label">Ter</div><div class="cal-dia-num">6 Mai</div><div class="cal-post cal-post-tikt">🎬 Vídeo Costa Verde</div></div>
+            <div class="cal-dia"><div class="cal-dia-label">Qua</div><div class="cal-dia-num">7 Mai</div><div class="cal-post cal-post-inst">📸 Evento Angra</div><div class="cal-post cal-post-wpp">💬 Disparo Base Paraty</div><div class="cal-post cal-post-ev">🎪 Reunião Coord.</div></div>
+            <div class="cal-dia"><div class="cal-dia-label">Qui</div><div class="cal-dia-num">8 Mai</div><div class="cal-post cal-post-tikt">🎬 Reels reivindicação</div><div class="cal-post cal-post-inst">📸 Stories visita campo</div></div>
+            <div class="cal-dia"><div class="cal-dia-label">Sex</div><div class="cal-dia-num">9 Mai</div><div class="cal-post cal-post-wpp">💬 Newsletter Renato</div><div class="cal-post cal-post-ev">🎪 Comício Itaguaí</div></div>
+            <div class="cal-dia"><div class="cal-dia-label">Sáb</div><div class="cal-dia-num">10 Mai</div><div class="cal-post cal-post-inst">📸 Bastidores campo</div><div class="cal-post cal-post-tikt">🎬 TikTok dia de campo</div></div>
+            <div class="cal-dia"><div class="cal-dia-label">Dom</div><div class="cal-dia-num">11 Mai</div><div class="cal-post cal-post-inst">📸 Post domingo (família/fé)</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ CALCULADORA ELEITORAL ══ -->
+      <div id="sec-calculadora" class="section">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Coeficiente Eleitoral Est.</div><div class="kpi-value" style="color:#22c55e;">39.118</div><div class="kpi-sub" style="color:var(--texto-sec);">votos válidos ÷ vagas</div></div>
+          <div class="kpi-card"><div class="kpi-label">Meta de Votos (com margem)</div><div class="kpi-value" style="color:#60a5fa;">45.000</div><div class="kpi-sub" style="color:var(--texto-sec);">coef. + 15% margem segurança</div></div>
+          <div class="kpi-card"><div class="kpi-label">Votos Comprometidos Atual</div><div class="kpi-value" style="color:#f59e0b;">28.400</div><div class="kpi-sub warn">63% da meta — faltam 16.600</div></div>
+          <div class="kpi-card"><div class="kpi-label">Probabilidade de Eleição</div><div class="kpi-value" style="color:#22c55e;">82%</div><div class="kpi-sub up">cenário base atual</div></div>
+        </div>
+
+        <div class="grid2 mb14">
+          <div class="calc-section">
+            <div class="calc-title">⚙️ Simulador de Coeficiente Eleitoral</div>
+            <div class="calc-row">
+              <div class="calc-label">Total de eleitores aptos (RJ Fed.)</div>
+              <input class="calc-input" id="inp_eleitores" type="number" value="12420000" onchange="calcCoef()">
+            </div>
+            <div class="calc-row">
+              <div class="calc-label">Estimativa de comparecimento (%)</div>
+              <input class="calc-input" id="inp_comp" type="number" value="74" onchange="calcCoef()">
+            </div>
+            <div class="calc-row">
+              <div class="calc-label">Votos brancos + nulos estimados (%)</div>
+              <input class="calc-input" id="inp_invalidos" type="number" value="10" onchange="calcCoef()">
+            </div>
+            <div class="calc-row">
+              <div class="calc-label">Número de vagas (Dep. Federal RJ)</div>
+              <input class="calc-input" id="inp_vagas" type="number" value="46" onchange="calcCoef()">
+            </div>
+            <div class="calc-row">
+              <div class="calc-label">Margem de segurança adicional (%)</div>
+              <input class="calc-input" id="inp_margem" type="number" value="15" onchange="calcCoef()">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+              <div class="calc-result-box">
+                <div class="calc-result-label">Coeficiente Eleitoral</div>
+                <div class="calc-result-value" id="res_coef">39.118</div>
+                <div class="calc-result-sub">votos mínimos para garantir vaga</div>
+              </div>
+              <div class="calc-result-box" style="background:#0d1a2a;border-color:#3b82f644;">
+                <div class="calc-result-label" style="color:#93c5fd;">Meta com Margem</div>
+                <div class="calc-result-value" style="color:#60a5fa;" id="res_meta">44.986</div>
+                <div class="calc-result-sub" style="color:#93c5fd;">meta recomendada p/ sua campanha</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="calc-section">
+            <div class="calc-title">📊 Simulador de Quociente Partidário (PL)</div>
+            <div class="calc-row">
+              <div class="calc-label">Votos esperados Renato Araújo</div>
+              <input class="calc-input" id="inp_renato" type="number" value="45000" onchange="calcQP()">
+            </div>
+            <div class="calc-row">
+              <div class="calc-label">Votos estimados PL total (RJ)</div>
+              <input class="calc-input" id="inp_pl_total" type="number" value="1840000" onchange="calcQP()">
+            </div>
+            <div class="calc-row">
+              <div class="calc-label">Candidatos do PL disputando</div>
+              <input class="calc-input" id="inp_pl_cands" type="number" value="28" onchange="calcQP()">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+              <div class="calc-result-box" style="background:#1a0d2a;border-color:#8b5cf644;">
+                <div class="calc-result-label" style="color:#c084fc;">Vagas pelo Quociente</div>
+                <div class="calc-result-value" style="color:#a855f7;" id="res_vagas_pl">14</div>
+                <div class="calc-result-sub" style="color:#c084fc;">vagas que o PL tem direito (RJ)</div>
+              </div>
+              <div class="calc-result-box" style="background:#0d2a1a;border-color:#22c55e44;">
+                <div class="calc-result-label">% dos votos PL</div>
+                <div class="calc-result-value" id="res_pct_renato">2,4%</div>
+                <div class="calc-result-sub">sua fatia dentro do PL</div>
+              </div>
+            </div>
+            <div style="margin-top:12px;padding:10px;background:#13131c;border-radius:8px;font-size:11px;color:var(--texto-sec);line-height:1.6;">
+              <b style="color:var(--branco);">Posição no PL:</b> com <span id="res_pos_pl" style="color:#22c55e;font-weight:700;">45.000</span> votos, Renato ficaria entre os <span id="res_rank_pl" style="color:#22c55e;font-weight:700;">3° mais votados</span> do PL no RJ, garantindo eleição com alta segurança dentro do quociente partidário.
+            </div>
+          </div>
+        </div>
+
+        <div class="mb14">
+          <div class="calc-title" style="font-size:12px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--cinza-borda);">🎯 Análise de Cenários — Eleição 2026</div>
+          <div class="calc-grid">
+            <div class="cenario-box cenario-otimista">
+              <div class="cenario-label" style="color:#86efac;">Cenário Otimista</div>
+              <div class="cenario-votos" style="color:#22c55e;">72.000</div>
+              <div class="cenario-prob" style="color:#86efac;">96% de probabilidade de eleição</div>
+              <div style="font-size:10px;color:var(--texto-sec);margin-top:8px;line-height:1.5;">Onda Bolsonaro forte + boa performance digital + Itaguaí ativado + mobilização máxima da base evangélica</div>
+            </div>
+            <div class="cenario-box cenario-base">
+              <div class="cenario-label" style="color:#93c5fd;">Cenário Base</div>
+              <div class="cenario-votos" style="color:#60a5fa;">45.000–55.000</div>
+              <div class="cenario-prob" style="color:#93c5fd;">82% de probabilidade</div>
+              <div style="font-size:10px;color:var(--texto-sec);margin-top:8px;line-height:1.5;">Tendências atuais mantidas + execução normal da campanha + coeficiente entre 38K e 41K</div>
+            </div>
+            <div class="cenario-box cenario-pessimista">
+              <div class="cenario-label" style="color:#fca5a5;">Cenário Pessimista</div>
+              <div class="cenario-votos" style="color:#ef4444;">32.000–38.000</div>
+              <div class="cenario-prob" style="color:#fca5a5;">38% de probabilidade</div>
+              <div style="font-size:10px;color:var(--texto-sec);margin-top:8px;line-height:1.5;">Coeficiente sobe acima de 42K + baixo comparecimento Costa Verde + adversários do PL canibalizam votos</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-section">
+          <div class="calc-title">🗺️ Mapeamento por Zona Eleitoral — Costa Verde</div>
+          <table class="zona-table">
+            <thead><tr><th>Zona Eleitoral</th><th>Município</th><th>Seções</th><th>Eleitores</th><th>Votos 2022</th><th>Meta 2026</th><th>Variação</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><b>4ª Zona</b></td><td>Angra dos Reis</td><td>382</td><td>48.200</td><td>9.840</td><td>13.000</td><td class="up">+32%</td><td><span class="card-badge badge-verde">Forte</span></td></tr>
+              <tr><td><b>4ª Zona</b></td><td>Angra — Interior</td><td>208</td><td>50.200</td><td>7.200</td><td>9.800</td><td class="up">+36%</td><td><span class="card-badge badge-verde">Forte</span></td></tr>
+              <tr><td><b>207ª Zona</b></td><td>Paraty</td><td>182</td><td>41.200</td><td>5.800</td><td>8.400</td><td class="up">+45%</td><td><span class="card-badge badge-amarelo">Crescimento</span></td></tr>
+              <tr><td><b>74ª Zona</b></td><td>Mangaratiba</td><td>110</td><td>28.800</td><td>3.100</td><td>5.200</td><td class="up">+68%</td><td><span class="card-badge badge-amarelo">Potencial</span></td></tr>
+              <tr><td><b>70ª Zona</b></td><td>Itaguaí</td><td>298</td><td>112.600</td><td>2.200</td><td>8.600</td><td class="up">+291%</td><td><span class="card-badge badge-vermelho">Crítico/Expandir</span></td></tr>
+            </tbody>
+          </table>
+          <div class="small-note" style="margin-top:8px;">* Dados de 2022 são referenciais. Meta 2026 calculada com base no coeficiente estimado, cobertura dos cabos e mobilização atual por zona. Itaguaí exige atenção prioritária pelo enorme potencial não ativado.</div>
         </div>
       </div>
 
@@ -1137,7 +2247,13 @@ const pageTitles = {
   diario:      ['Diário de Campanha', 'Acompanhamento diário de atividades, agenda e produtividade'],
   ia:          ['Inteligência Artificial Preditiva', 'Modelo GPE 2026 · Projeções · Sugestões e Alertas'],
   demandas:    ['Demandas Populares', 'Temas · Regiões · NPS Eleitoral e Urgências'],
-  financeiro:  ['Gestão Financeira', 'Budget · Gastos · ROI e Fluxo de Caixa Eleitoral'],
+  financeiro:  ['Gestão de Verba — Completo', 'Fundo Eleitoral · Fundo Partidário · Doações · Rubricas · Compliance Financeiro'],
+  material:    ['Material de Campanha', 'Estoque · Pedidos Gráficos · Distribuição por Município'],
+  cabos:       ['Rede de Cabos Eleitorais', 'Coordenadores · Metas de Votos · Cobertura de Bairros'],
+  crm:         ['CRM Eleitoral — Banco de Votos', 'Pipeline Eleitoral · Comprometidos · Multiplicadores · Meta 45K votos'],
+  comunicacao: ['Central de Comunicação', 'WhatsApp · Templates · Calendário Editorial · Engajamento'],
+  compliance:  ['Compliance TSE', 'Prestação de Contas · Prazos Legais · Documentos · Alertas Jurídicos'],
+  calculadora: ['Calculadora Eleitoral', 'Coeficiente · Quociente Partidário · Cenários · Zonas Eleitorais'],
   candidatos:  ['Todos os Candidatos', 'Monitoramento completo de candidatos concorrentes e aliados'],
   'candidato-detalhe': ['Monitoramento por Candidato', 'Ações, praça forte, agenda e desempenho territorial de cada concorrente'],
   eventos:     ['Agenda de Eventos', 'Comícios · Visitas · Lives · Debates programados'],
@@ -1466,19 +2582,88 @@ function buildCharts(id) {
     );
   }
   if (id === 'financeiro') {
-    mkChart('cBudget','doughnut',
-      ['TV/Rádio','Digital','Eventos','Material','Pessoal','Pesquisas','Outros'],
-      [{ data:[35,22,18,10,8,4,3],
-         backgroundColor:['#22c55e','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#60a5fa','#6b7280'],
-         borderWidth:0 }]
+    mkChart('cExecucao','line',
+      ['Sem 1','Sem 2','Sem 3','Sem 4','Sem 5','Sem 6','Sem 7','Sem 8 (prev)','Sem 9 (prev)','Sem 10 (prev)'],
+      [
+        { label:'Planejado', data:[200,260,310,360,410,460,510,620,720,800], borderColor:'#3b82f6', tension:.3, borderWidth:2, borderDash:[5,3], pointRadius:2 },
+        { label:'Realizado',  data:[180,320,440,540,650,760,850,null,null,null], borderColor:'#22c55e', backgroundColor:'rgba(34,197,94,0.1)', fill:true, tension:.3, borderWidth:2, pointBackgroundColor:'#22c55e', pointRadius:3 },
+        { label:'Projeção',  data:[null,null,null,null,null,null,850,980,1100,1140], borderColor:'#f59e0b', tension:.3, borderWidth:2, borderDash:[3,3], pointRadius:2 }
+      ]
     );
-    mkChart('cGastos','bar',
-      ['Jan','Fev','Mar','Abr','Mai (prev)','Jun (prev)'],
-      [{ label:'Gastos (R$ mil)', data:[120,185,210,265,310,250],
-         backgroundColor:'rgba(34,197,94,0.7)', borderRadius:4 }]
+    mkChart('cFontes','doughnut',
+      ['Fundo Eleitoral','Fundo Partidário','Doações PF'],
+      [{ data:[80,15,5], backgroundColor:['#22c55e','#3b82f6','#fb923c'], borderWidth:0 }]
+    );
+  }
+  if (id === 'crm') {
+    mkChart('cCrmMunicipio','bar',
+      ['Angra dos Reis','Paraty','Mangaratiba','Itaguaí'],
+      [
+        { label:'Meta', data:[21000,10500,6800,6700], backgroundColor:'rgba(59,130,246,0.4)', borderRadius:3, borderSkipped:false },
+        { label:'Comprometidos', data:[17100,6300,3700,1300], backgroundColor:['#22c55e','#f59e0b','#f59e0b','#ef4444'], borderRadius:3, borderSkipped:false }
+      ],
+      { plugins:{ legend:{ display:true, labels:{ color:'#8a8aaa', font:{ size:9 } } } } }
+    );
+  }
+  if (id === 'comunicacao') {
+    mkChart('cEngajamento','line',
+      ['Sem 14','Sem 15','Sem 16','Sem 17','Sem 18'],
+      [
+        { label:'WhatsApp', data:[62,65,68,71,68], borderColor:'#25d366', tension:.4, borderWidth:2, pointRadius:3 },
+        { label:'Instagram', data:[4.8,5.2,5.9,6.4,6.8], borderColor:'#e1306c', tension:.4, borderWidth:2, pointRadius:3 }
+      ],
+      { plugins:{ legend:{ display:true, labels:{ color:'#8a8aaa', font:{ size:9 } } } } }
     );
   }
 }
+
+/* ── CALCULADORA ELEITORAL ── */
+function calcCoef() {
+  const eleitores  = parseFloat(document.getElementById('inp_eleitores').value) || 12420000;
+  const comp       = parseFloat(document.getElementById('inp_comp').value) / 100 || 0.74;
+  const invalidos  = parseFloat(document.getElementById('inp_invalidos').value) / 100 || 0.10;
+  const vagas      = parseFloat(document.getElementById('inp_vagas').value) || 46;
+  const margem     = parseFloat(document.getElementById('inp_margem').value) / 100 || 0.15;
+  const totalVotos = eleitores * comp;
+  const validos    = totalVotos * (1 - invalidos);
+  const coef       = Math.round(validos / vagas);
+  const meta       = Math.round(coef * (1 + margem));
+  const el_coef = document.getElementById('res_coef');
+  const el_meta = document.getElementById('res_meta');
+  if (el_coef) el_coef.textContent = coef.toLocaleString('pt-BR');
+  if (el_meta) el_meta.textContent = meta.toLocaleString('pt-BR');
+}
+
+function calcQP() {
+  const renato    = parseFloat(document.getElementById('inp_renato').value) || 45000;
+  const pl_total  = parseFloat(document.getElementById('inp_pl_total').value) || 1840000;
+  const pl_cands  = parseFloat(document.getElementById('inp_pl_cands').value) || 28;
+  const eleitores = 12420000, comp = 0.74, invalidos = 0.10, vagas = 46;
+  const validos = eleitores * comp * (1 - invalidos);
+  const coef = Math.round(validos / vagas);
+  const vagas_pl = Math.floor(pl_total / coef);
+  const pct = ((renato / pl_total) * 100).toFixed(1);
+  const pos = Math.ceil((pl_total / pl_cands) / renato * (pl_cands * 0.3));
+  const elR = document.getElementById('res_vagas_pl');
+  const elP = document.getElementById('res_pct_renato');
+  const elPOS = document.getElementById('res_pos_pl');
+  const elRANK = document.getElementById('res_rank_pl');
+  if (elR) elR.textContent = vagas_pl;
+  if (elP) elP.textContent = pct + '%';
+  if (elPOS) elPOS.textContent = renato.toLocaleString('pt-BR');
+  if (elRANK) elRANK.textContent = (pos <= 3 ? '3° mais votados' : pos <= 5 ? '5 primeiros' : 'top 10');
+}
+
+/* ── COUNTDOWN ELEIÇÃO ── */
+function updateCountdown() {
+  const eleicao = new Date('2026-10-04T00:00:00');
+  const agora   = new Date();
+  const diff    = Math.ceil((eleicao - agora) / (1000 * 60 * 60 * 24));
+  const el = document.getElementById('countdown_dias');
+  if (el) el.textContent = Math.max(0, diff);
+}
+updateCountdown();
+setInterval(updateCountdown, 60000);
 
 function reloadCharts() {
   const active = document.querySelector('.section.active');
@@ -1487,9 +2672,51 @@ function reloadCharts() {
   buildCharts(id);
 }
 
+/* ── LOGIN ── */
+const _CREDS = { login: 'guest', senha: btoa('p0l1t1c4@#') };
+
+function doLogin() {
+  const loginEl = document.getElementById('inp_login');
+  const senhaEl = document.getElementById('inp_senha');
+  const errEl   = document.getElementById('login-error');
+  const btnEl   = document.getElementById('login-btn');
+
+  const loginVal = (loginEl.value || '').trim();
+  const senhaVal = (senhaEl.value || '').trim();
+
+  if (loginVal === _CREDS.login && btoa(senhaVal) === _CREDS.senha) {
+    // ✓ Credenciais corretas
+    errEl.classList.remove('visible');
+    btnEl.disabled = true;
+    btnEl.textContent = 'Autenticando…';
+
+    const screen = document.getElementById('login-screen');
+    screen.classList.add('fade-out');
+    setTimeout(() => {
+      screen.style.display = 'none';
+      const app = document.getElementById('app');
+      app.classList.add('logado');
+      if (window.lucide) window.lucide.createIcons();
+      setTimeout(() => { buildCharts('dashboard'); calcCoef(); calcQP(); updateCountdown(); }, 200);
+    }, 500);
+  } else {
+    // ✗ Credenciais erradas
+    errEl.classList.add('visible');
+    [loginEl, senhaEl].forEach(el => {
+      el.classList.add('shake');
+      el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+    });
+    senhaEl.value = '';
+    senhaEl.focus();
+  }
+}
+
 /* ── INIT ── */
-if (window.lucide) window.lucide.createIcons();
-setTimeout(() => buildCharts('dashboard'), 200);
+// O app só inicia após login — o buildCharts é chamado dentro de doLogin()
+document.addEventListener('DOMContentLoaded', () => {
+  const loginEl = document.getElementById('inp_login');
+  if (loginEl) loginEl.focus();
+});
 </script>
 </body>
 </html>
