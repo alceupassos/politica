@@ -70,6 +70,10 @@ export const pageTitles = {
     "Material de Campanha",
     "Estoque · Pedidos Gráficos · Distribuição por Município"
   ],
+  "downloads": [
+    "Downloads de Materiais",
+    "Upload · Thumbnails · Nome, descrição e arquivos para baixar"
+  ],
   "cabos": [
     "Rede de Cabos Eleitorais",
     "Coordenadores · Metas de Votos · Cobertura de Bairros"

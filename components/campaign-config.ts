@@ -37,6 +37,7 @@ export const navigationGroups = [
       { id: "cabos", icon: "network", label: "Rede de Cabos" },
       { id: "crm", icon: "vote", label: "CRM Eleitoral" },
       { id: "material", icon: "package-2", label: "Material Camp." },
+      { id: "downloads", icon: "folder-down", label: "Downloads" },
       { id: "comunicacao", icon: "message-circle", label: "Comunicação" },
     ],
   },

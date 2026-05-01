@@ -7,7 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "sync:cockpit": "node scripts/sync-campaign-source.mjs",
     "remotion:studio": "remotion studio",
     "remotion:render": "remotion render remotion/index.ts CampaignWeeklyVideo out/campaign-weekly.mp4"
   },

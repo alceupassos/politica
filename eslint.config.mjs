@@ -10,7 +10,6 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    "cockpit_campanha_renato_araujo.html",
   ]),
 ]);
 

@@ -7,6 +7,7 @@ import { candidateDetails, campaignSections, pageTitles } from "@/components/cam
 import { renderSectionCharts } from "@/components/campaign-charts";
 import { navigationGroups, refreshableSections } from "@/components/campaign-config";
 import { CandidateDetail } from "@/components/candidate-detail";
+import { CampaignDownloads } from "@/components/campaign-downloads";
 import { LoginScreen } from "@/components/login-screen";
 
 declare global {
@@ -85,13 +86,16 @@ export function CampaignCockpit() {
 
   const titlePair = pageTitles[activeSection] ?? pageTitles.dashboard;
   const activeMarkup = useMemo(() => {
-    if (activeSection === "candidato-detalhe") return null;
+    if (activeSection === "candidato-detalhe" || activeSection === "downloads") return null;
     const sectionMarkup = campaignSections[activeSection as keyof typeof campaignSections] ?? "";
     return sectionMarkup.replace('class="section"', 'class="section active"');
   }, [activeSection]);
 
   useEffect(() => {
-    setLastUpdate(formatLastUpdate());
+    window.setTimeout(() => {
+      setLastUpdate(formatLastUpdate());
+    }, 0);
+
     const interval = window.setInterval(() => {
       setLastUpdate(formatLastUpdate());
       updateCountdownElement();
@@ -225,7 +229,7 @@ export function CampaignCockpit() {
 
           <div className="sidebar-footer">
             <div className="sf-label">Última atualização</div>
-            <div className="sf-val" id="lastUpdate">{lastUpdate}</div>
+            <div className="sf-val" id="lastUpdate" suppressHydrationWarning>{lastUpdate}</div>
           </div>
         </div>
 
@@ -258,6 +262,8 @@ export function CampaignCockpit() {
           <div id="content" ref={sectionHostRef}>
             {activeSection === "candidato-detalhe" ? (
               <CandidateDetail candidateKey={selectedCandidateKey} />
+            ) : activeSection === "downloads" ? (
+              <CampaignDownloads />
             ) : (
               <div dangerouslySetInnerHTML={{ __html: activeMarkup ?? "" }} suppressHydrationWarning />
             )}
