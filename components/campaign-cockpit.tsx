@@ -1,13 +1,21 @@
 "use client";
 
 import Script from "next/script";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 
-import { campaignMarkup, campaignRuntime } from "@/components/campaign-source";
+import { campaignAppMarkup, campaignRuntime } from "@/components/campaign-source";
+import { LoginScreen } from "@/components/login-screen";
 
 declare global {
   interface Window {
     __campaignCockpitBootstrapped?: boolean;
+    __campaignCockpitApi?: {
+      buildCharts: (id: string) => void;
+      calcCoef: () => void;
+      calcQP: () => void;
+      updateCountdown: () => void;
+      reloadCharts: () => void;
+    };
     Chart?: unknown;
     lucide?: { createIcons: () => void };
   }
@@ -36,7 +44,7 @@ function waitForRuntime() {
 }
 
 export function CampaignCockpit() {
-  const rootRef = useRef<HTMLDivElement>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -59,6 +67,28 @@ export function CampaignCockpit() {
     };
   }, []);
 
+  useEffect(() => {
+    const app = document.getElementById("app");
+    if (!app) return;
+
+    app.classList.toggle("logado", isLoggedIn);
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    const startLegacyDashboard = () => {
+      window.lucide?.createIcons();
+      window.__campaignCockpitApi?.buildCharts("dashboard");
+      window.__campaignCockpitApi?.calcCoef();
+      window.__campaignCockpitApi?.calcQP();
+      window.__campaignCockpitApi?.updateCountdown();
+    };
+
+    const timer = window.setTimeout(startLegacyDashboard, 220);
+    return () => window.clearTimeout(timer);
+  }, [isLoggedIn]);
+
   return (
     <>
       <Script
@@ -69,9 +99,10 @@ export function CampaignCockpit() {
         src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"
         strategy="afterInteractive"
       />
+      {!isLoggedIn ? <LoginScreen onLogin={() => setIsLoggedIn(true)} /> : null}
       <div
-        ref={rootRef}
-        dangerouslySetInnerHTML={{ __html: campaignMarkup }}
+        dangerouslySetInnerHTML={{ __html: campaignAppMarkup }}
+        suppressHydrationWarning
       />
     </>
   );

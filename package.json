@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "sync:cockpit": "node scripts/sync-campaign-source.mjs",
     "remotion:studio": "remotion studio",
     "remotion:render": "remotion render remotion/index.ts CampaignWeeklyVideo out/campaign-weekly.mp4"
   },
@@ -14,6 +15,8 @@
     "@radix-ui/react-slot": "^1.2.4",
     "@remotion/player": "^4.0.454",
     "@remotion/renderer": "^4.0.454",
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.105.1",
     "chart.js": "^4.5.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
